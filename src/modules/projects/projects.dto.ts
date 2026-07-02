@@ -5,9 +5,17 @@ export class ProjectDTO {
   @ApiProperty({ description: 'Project name' })
   @IsString()
   @IsNotEmpty()
-  name: string = ''
+  name: string
 
   @ApiProperty({ description: 'Project description', required: false })
   @IsString()
-  description: string = ''
+  description: string
+}
+
+export class ProjectListItemDTO {
+  @ApiProperty() id: string
+  @ApiProperty() name: string
+  @ApiProperty() description: string
+  @ApiProperty({ format: 'date-time' }) createdAt: string
+  @ApiProperty({ format: 'date-time' }) updatedAt: string
 }
