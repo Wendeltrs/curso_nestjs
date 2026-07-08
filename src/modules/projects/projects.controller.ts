@@ -11,7 +11,7 @@ import {
   Put,
 } from '@nestjs/common'
 import { ApiResponse } from '@nestjs/swagger'
-import { ProjectDTO, ProjectListItemDTO } from './projects.dto'
+import { ProjectCreateDTO, ProjectDTO, ProjectUpdateDTO } from './projects.dto'
 import { ProjectsService } from './projects.service'
 
 @Controller({
@@ -23,7 +23,7 @@ export class ProjectsController {
 
   @Get()
   @ApiResponse({
-    type: [ProjectListItemDTO],
+    type: [ProjectDTO],
   })
   public getAll() {
     return this.projectsService.getAll()
@@ -31,7 +31,7 @@ export class ProjectsController {
 
   @Get(':id')
   @ApiResponse({
-    type: ProjectListItemDTO,
+    type: ProjectDTO,
   })
   public get(@Param('id', ParseUUIDPipe) id: string) {
     return this.projectsService.get(id)
@@ -39,17 +39,20 @@ export class ProjectsController {
 
   @Post()
   @ApiResponse({
-    type: ProjectListItemDTO,
+    type: ProjectDTO,
   })
-  public create(@Body() data: ProjectDTO) {
+  public create(@Body() data: ProjectCreateDTO) {
     return this.projectsService.create(data)
   }
 
   @Put(':id')
   @ApiResponse({
-    type: ProjectListItemDTO,
+    type: ProjectDTO,
   })
-  public update(@Param('id', ParseUUIDPipe) id: string, @Body() data: ProjectDTO) {
+  public update(
+    @Param('id', ParseUUIDPipe) id: string, 
+    @Body() data: ProjectUpdateDTO
+  ) {
     return this.projectsService.update(id, data)
   }
 

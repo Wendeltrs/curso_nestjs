@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common'
 import { PrismaService } from 'src/prisma.service'
-import { ProjectDTO } from './projects.dto'
+import { ProjectCreateDTO, ProjectUpdateDTO } from './projects.dto'
 
 @Injectable()
 export class ProjectsService {
@@ -29,7 +29,7 @@ export class ProjectsService {
     return project
   }
 
-  public create(data: ProjectDTO) {
+  public create(data: ProjectCreateDTO) {
     return this.prisma.project.create({
       data: {
         name: data.name,
@@ -38,7 +38,7 @@ export class ProjectsService {
     })
   }
 
-  public async update(id: string, data: ProjectDTO) {
+  public async update(id: string, data: ProjectUpdateDTO) {
     const project = await this.prisma.project.findFirst({
       where: {
         id,
