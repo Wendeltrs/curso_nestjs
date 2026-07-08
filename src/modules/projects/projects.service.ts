@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common'
 import { PrismaService } from 'src/prisma.service'
 import { ProjectDTO } from './projects.dto'
 
@@ -14,13 +14,19 @@ export class ProjectsService {
     })
   }
 
-  public get(id: string) {
-    return this.prisma.project.findFirst({
+  public async get(id: string) {
+    const project = await this.prisma.project.findFirst({
       where: {
         id,
         deletedAt: null,
       },
     })
+
+    if (!project) {
+      throw new HttpException('Project not found', HttpStatus.NOT_FOUND)
+    }
+
+    return project
   }
 
   public create(data: ProjectDTO) {
@@ -28,30 +34,52 @@ export class ProjectsService {
       data: {
         name: data.name,
         description: data.description,
-      }
+      },
     })
   }
 
-  public update(id: string, data: ProjectDTO) {
-    return this.prisma.project.update({
+  public async update(id: string, data: ProjectDTO) {
+    const project = await this.prisma.project.findFirst({
       where: {
         id,
+        deletedAt: null,
+      },
+    })
+
+    if (!project) {
+      throw new HttpException('Project not found', HttpStatus.NOT_FOUND)
+    }
+
+    return this.prisma.project.update({
+      where: {
+        id: project.id,
       },
       data: {
         name: data.name,
         description: data.description,
-      }
+      },
     })
   }
 
-  public delete(id: string) {
-    return this.prisma.project.update({
+  public async delete(id: string) {
+    const project = await this.prisma.project.findFirst({
       where: {
         id,
+        deletedAt: null,
+      },
+    })
+
+    if (!project) {
+      throw new HttpException('Project not found', HttpStatus.NOT_FOUND)
+    }
+
+    return this.prisma.project.update({
+      where: {
+        id: project.id,
       },
       data: {
         deletedAt: new Date(),
-      }
+      },
     })
   }
 }
