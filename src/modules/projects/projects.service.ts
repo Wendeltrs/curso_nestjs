@@ -1,14 +1,16 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common'
-import { PrismaService } from 'src/prisma.service'
+import { PrismaService } from 'src/prisma/prisma.service'
+import { QueryDto } from 'src/services/query/query.decorator'
 import { ProjectCreateDTO, ProjectUpdateDTO } from './projects.dto'
 
 @Injectable()
 export class ProjectsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  public getAll() {
+  public getAll(query: QueryDto) {
     return this.prisma.project.findMany({
       where: {
+        ...query.where,
         deletedAt: null,
       },
     })

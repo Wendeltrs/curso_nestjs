@@ -11,6 +11,7 @@ import {
   Put,
 } from '@nestjs/common'
 import { ApiResponse } from '@nestjs/swagger'
+import { QueryDto, QueryPaginator } from 'src/services/query/query.decorator'
 import { ProjectCreateDTO, ProjectDTO, ProjectUpdateDTO } from './projects.dto'
 import { ProjectsService } from './projects.service'
 
@@ -25,8 +26,8 @@ export class ProjectsController {
   @ApiResponse({
     type: [ProjectDTO],
   })
-  public getAll() {
-    return this.projectsService.getAll()
+  public getAll(@QueryPaginator() query: QueryDto) {
+    return this.projectsService.getAll(query)
   }
 
   @Get(':id')
@@ -49,10 +50,7 @@ export class ProjectsController {
   @ApiResponse({
     type: ProjectDTO,
   })
-  public update(
-    @Param('id', ParseUUIDPipe) id: string, 
-    @Body() data: ProjectUpdateDTO
-  ) {
+  public update(@Param('id', ParseUUIDPipe) id: string, @Body() data: ProjectUpdateDTO) {
     return this.projectsService.update(id, data)
   }
 
