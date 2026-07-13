@@ -51,7 +51,7 @@ export class TaskCreateDTO {
   @IsOptional()
   projectId: string
 
-  @ApiProperty({ format: 'date-time', description: 'Task due date', required: false })
+  @ApiProperty({ description: 'Task due date', required: false })
   @IsDateString()
   @IsOptional()
   dueDate?: string
