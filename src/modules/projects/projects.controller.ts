@@ -9,8 +9,11 @@ import {
   ParseUUIDPipe,
   Post,
   Put,
+  UseInterceptors,
 } from '@nestjs/common'
 import { ApiResponse } from '@nestjs/swagger'
+import { ValidateResourcesIds } from 'src/common/decorators/validate-resources-ids.decorator'
+import { ValidateResourcesIdsInterceptor } from 'src/common/interceptors/validate-resources-ids.interceptor'
 import { QueryDto, QueryPaginator } from 'src/services/query/query.decorator'
 import { ProjectCreateDTO, ProjectDTO, ProjectUpdateDTO } from './projects.dto'
 import { ProjectsService } from './projects.service'
@@ -19,6 +22,7 @@ import { ProjectsService } from './projects.service'
   path: 'projects',
   version: '1',
 })
+@UseInterceptors(ValidateResourcesIdsInterceptor)
 export class ProjectsController {
   constructor(private projectsService: ProjectsService) {}
 
@@ -30,11 +34,12 @@ export class ProjectsController {
     return this.projectsService.getAll(query)
   }
 
-  @Get(':id')
+  @Get(':projectId')
   @ApiResponse({
     type: ProjectDTO,
   })
-  public get(@Param('id', ParseUUIDPipe) id: string) {
+  @ValidateResourcesIds()
+  public get(@Param('projectId', ParseUUIDPipe) id: string) {
     return this.projectsService.get(id)
   }
 
@@ -46,17 +51,19 @@ export class ProjectsController {
     return this.projectsService.create(data)
   }
 
-  @Put(':id')
+  @Put(':projectId')
   @ApiResponse({
     type: ProjectDTO,
   })
-  public update(@Param('id', ParseUUIDPipe) id: string, @Body() data: ProjectUpdateDTO) {
+  @ValidateResourcesIds()
+  public update(@Param('projectId', ParseUUIDPipe) id: string, @Body() data: ProjectUpdateDTO) {
     return this.projectsService.update(id, data)
   }
 
-  @Delete(':id')
+  @Delete(':projectId')
   @HttpCode(HttpStatus.NO_CONTENT)
-  public delete(@Param('id', ParseUUIDPipe) id: string) {
+  @ValidateResourcesIds()
+  public delete(@Param('projectId', ParseUUIDPipe) id: string) {
     return this.projectsService.delete(id)
   }
 }

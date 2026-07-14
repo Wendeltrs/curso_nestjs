@@ -9,13 +9,17 @@ import {
   ParseUUIDPipe,
   Post,
   Put,
+  UseInterceptors,
 } from '@nestjs/common'
 import { ApiResponse } from '@nestjs/swagger'
+import { ValidateResourcesIds } from 'src/common/decorators/validate-resources-ids.decorator'
+import { ValidateResourcesIdsInterceptor } from 'src/common/interceptors/validate-resources-ids.interceptor'
 import { QueryDto, QueryPaginator } from 'src/services/query/query.decorator'
 import { TaskCreateDTO, TasksDTO, TaskUpdateDTO } from './tasks.dto'
 import { TasksService } from './tasks.service'
 
 @Controller({ path: 'tasks', version: '1' })
+@UseInterceptors(ValidateResourcesIdsInterceptor)
 export class TasksController {
   constructor(private tasksService: TasksService) {}
 
@@ -25,9 +29,10 @@ export class TasksController {
     return this.tasksService.getAll(query)
   }
 
-  @Get(':id')
+  @Get(':taskId')
   @ApiResponse({ type: TasksDTO })
-  public get(@Param('id', ParseUUIDPipe) id: string, @QueryPaginator() query: QueryDto) {
+  @ValidateResourcesIds()
+  public get(@Param('taskId', ParseUUIDPipe) id: string, @QueryPaginator() query: QueryDto) {
     return this.tasksService.get(id, query)
   }
 
@@ -37,15 +42,17 @@ export class TasksController {
     return this.tasksService.create(data)
   }
 
-  @Put(':id')
+  @Put(':taskId')
   @ApiResponse({ type: TasksDTO })
-  public update(@Param('id', ParseUUIDPipe) id: string, @Body() data: TaskUpdateDTO) {
+  @ValidateResourcesIds()
+  public update(@Param('taskId', ParseUUIDPipe) id: string, @Body() data: TaskUpdateDTO) {
     return this.tasksService.update(id, data)
   }
 
-  @Delete(':id')
+  @Delete(':taskId')
   @HttpCode(HttpStatus.NO_CONTENT)
-  public delete(@Param('id', ParseUUIDPipe) id: string) {
+  @ValidateResourcesIds()
+  public delete(@Param('taskId', ParseUUIDPipe) id: string) {
     return this.tasksService.delete(id)
   }
 }
