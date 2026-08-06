@@ -13,6 +13,9 @@ export class ProjectsService {
         ...query.where,
         deletedAt: null,
       },
+      include: {
+        tasks: true,
+      },
     })
   }
 
@@ -21,6 +24,9 @@ export class ProjectsService {
       where: {
         id,
         deletedAt: null,
+      },
+      include: {
+        tasks: true,
       },
     })
   }

@@ -1,14 +1,29 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { TaskPriority, TaskStatus } from '@prisma/client'
 import { IsDateString, IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator'
+import { ProjectDTO } from '../projects/projects.dto'
 
 export class TasksDTO {
   @ApiProperty() id: string
   @ApiProperty() title: string
   @ApiProperty() description: string
-  @ApiProperty() status: TaskStatus
-  @ApiProperty() priority: TaskPriority
+  @ApiProperty({ enum: TaskStatus, default: TaskStatus.TODO }) status: TaskStatus
+  @ApiProperty({ enum: TaskPriority, default: TaskPriority.MEDIUM }) priority: TaskPriority
   @ApiProperty() projectId: string
+  @ApiProperty({ format: 'date-time' }) dueDate: string
+  @ApiProperty({ format: 'date-time' }) createdAt: string
+  @ApiProperty({ format: 'date-time' }) updatedAt: string
+  @ApiProperty({ format: 'date-time' }) deletedAt: string
+}
+
+export class TasksFullDTO {
+  @ApiProperty() id: string
+  @ApiProperty() title: string
+  @ApiProperty() description: string
+  @ApiProperty({ enum: TaskStatus, default: TaskStatus.TODO }) status: TaskStatus
+  @ApiProperty({ enum: TaskPriority, default: TaskPriority.MEDIUM }) priority: TaskPriority
+  @ApiProperty() projectId: string
+  @ApiProperty({ type: () => ProjectDTO }) project: ProjectDTO
   @ApiProperty({ format: 'date-time' }) dueDate: string
   @ApiProperty({ format: 'date-time' }) createdAt: string
   @ApiProperty({ format: 'date-time' }) updatedAt: string

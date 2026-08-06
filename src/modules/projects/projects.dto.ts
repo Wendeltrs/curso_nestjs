@@ -6,7 +6,16 @@ export class ProjectDTO {
   @ApiProperty() id: string
   @ApiProperty() name: string
   @ApiProperty() description: string
-  @ApiProperty({ type: [TasksDTO] }) tasks: TasksDTO[]
+  @ApiProperty({ format: 'date-time' }) createdAt: string
+  @ApiProperty({ format: 'date-time' }) updatedAt: string
+  @ApiProperty({ format: 'date-time' }) deletedAt: string
+}
+
+export class ProjectFullDTO {
+  @ApiProperty() id: string
+  @ApiProperty() name: string
+  @ApiProperty() description: string
+  @ApiProperty({ type: () => [TasksDTO] }) tasks: TasksDTO[]
   @ApiProperty({ format: 'date-time' }) createdAt: string
   @ApiProperty({ format: 'date-time' }) updatedAt: string
   @ApiProperty({ format: 'date-time' }) deletedAt: string

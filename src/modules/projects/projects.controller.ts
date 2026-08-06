@@ -12,10 +12,13 @@ import {
   UseInterceptors,
 } from '@nestjs/common'
 import { ApiResponse } from '@nestjs/swagger'
-import { ValidateResourcesIds } from 'src/common/decorators/validate-resources-ids.decorator'
-import { ValidateResourcesIdsInterceptor } from 'src/common/interceptors/validate-resources-ids.interceptor'
+import { Paginator } from 'src/common/decorators/paginator/paginator.decorator'
+import { Serializer } from 'src/common/decorators/serializer/serializer.decorator'
+import { ValidateResourcesIds } from 'src/common/decorators/validate-resources-ids/validate-resources-ids.decorator'
+import { ValidateResourcesIdsInterceptor } from 'src/common/interceptors/validate-resources-ids/validate-resources-ids.interceptor'
+import { Project } from 'src/models/project'
 import { QueryDto, QueryPaginator } from 'src/services/query/query.decorator'
-import { ProjectCreateDTO, ProjectDTO, ProjectUpdateDTO } from './projects.dto'
+import { ProjectCreateDTO, ProjectDTO, ProjectFullDTO, ProjectUpdateDTO } from './projects.dto'
 import { ProjectsService } from './projects.service'
 
 @Controller({
@@ -27,18 +30,17 @@ export class ProjectsController {
   constructor(private projectsService: ProjectsService) {}
 
   @Get()
-  @ApiResponse({
-    type: [ProjectDTO],
-  })
+  @ApiResponse({ type: [ProjectFullDTO] })
+  @Paginator()
+  @Serializer(Project)
   public getAll(@QueryPaginator() query: QueryDto) {
     return this.projectsService.getAll(query)
   }
 
   @Get(':projectId')
-  @ApiResponse({
-    type: ProjectDTO,
-  })
+  @ApiResponse({ type: ProjectFullDTO })
   @ValidateResourcesIds()
+  @Serializer(Project)
   public get(@Param('projectId', ParseUUIDPipe) id: string) {
     return this.projectsService.get(id)
   }

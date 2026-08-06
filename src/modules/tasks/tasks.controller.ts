@@ -12,10 +12,13 @@ import {
   UseInterceptors,
 } from '@nestjs/common'
 import { ApiResponse } from '@nestjs/swagger'
-import { ValidateResourcesIds } from 'src/common/decorators/validate-resources-ids.decorator'
-import { ValidateResourcesIdsInterceptor } from 'src/common/interceptors/validate-resources-ids.interceptor'
+import { Paginator } from 'src/common/decorators/paginator/paginator.decorator'
+import { Serializer } from 'src/common/decorators/serializer/serializer.decorator'
+import { ValidateResourcesIds } from 'src/common/decorators/validate-resources-ids/validate-resources-ids.decorator'
+import { ValidateResourcesIdsInterceptor } from 'src/common/interceptors/validate-resources-ids/validate-resources-ids.interceptor'
+import { Task } from 'src/models/task'
 import { QueryDto, QueryPaginator } from 'src/services/query/query.decorator'
-import { TaskCreateDTO, TasksDTO, TaskUpdateDTO } from './tasks.dto'
+import { TaskCreateDTO, TasksDTO, TasksFullDTO, TaskUpdateDTO } from './tasks.dto'
 import { TasksService } from './tasks.service'
 
 @Controller({ path: 'tasks', version: '1' })
@@ -24,14 +27,17 @@ export class TasksController {
   constructor(private tasksService: TasksService) {}
 
   @Get()
-  @ApiResponse({ type: [TasksDTO] })
+  @ApiResponse({ type: [TasksFullDTO] })
+  @Paginator()
+  @Serializer(Task)
   public getAll(@QueryPaginator() query: QueryDto) {
     return this.tasksService.getAll(query)
   }
 
   @Get(':taskId')
-  @ApiResponse({ type: TasksDTO })
+  @ApiResponse({ type: TasksFullDTO })
   @ValidateResourcesIds()
+  @Serializer(Task)
   public get(@Param('taskId', ParseUUIDPipe) id: string, @QueryPaginator() query: QueryDto) {
     return this.tasksService.get(id, query)
   }

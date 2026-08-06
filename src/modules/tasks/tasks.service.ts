@@ -11,7 +11,10 @@ export class TasksService {
     return await this.prisma.task.findMany({
       where: {
         ...query.where,
-        deletedAt: null,        
+        deletedAt: null,
+      },
+      include: {
+        project: true,
       },
     })
   }
@@ -33,6 +36,9 @@ export class TasksService {
         id,
         projectId: project?.id,
         deletedAt: null,
+      },
+      include: {
+        project: true,
       },
     })
   }
