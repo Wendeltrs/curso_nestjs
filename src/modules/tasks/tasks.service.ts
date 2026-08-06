@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, NotFoundException } from '@nestjs/common'
 import { PrismaService } from 'src/prisma/prisma.service'
 import { QueryDto } from 'src/services/query/query.decorator'
 import { TaskCreateDTO, TaskUpdateDTO } from './tasks.dto'
@@ -17,10 +17,21 @@ export class TasksService {
   }
 
   public async get(id: string, query: QueryDto) {
+    const project = await this.prisma.project.findFirst({
+      where: {
+        id: query?.where?.projectId,
+        deletedAt: null,
+      },
+    })
+
+    if (!project) {
+      throw new NotFoundException('Project not found')
+    }
+
     return await this.prisma.task.findFirst({
       where: {
         id,
-        ...query.where,
+        projectId: project?.id,
         deletedAt: null,
       },
     })

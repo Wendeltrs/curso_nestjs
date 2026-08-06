@@ -7,8 +7,8 @@ import { ProjectCreateDTO, ProjectUpdateDTO } from './projects.dto'
 export class ProjectsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  public getAll(query: QueryDto) {
-    return this.prisma.project.findMany({
+  public async getAll(query: QueryDto) {
+    return await this.prisma.project.findMany({
       where: {
         ...query.where,
         deletedAt: null,
@@ -35,7 +35,7 @@ export class ProjectsService {
   }
 
   public async update(id: string, data: ProjectUpdateDTO) {
-    return this.prisma.project.update({
+    return await this.prisma.project.update({
       where: {
         id,
       },
@@ -47,7 +47,16 @@ export class ProjectsService {
   }
 
   public async delete(id: string) {
-    return this.prisma.project.update({
+    await this.prisma.task.updateMany({
+      where: {
+        projectId: id,
+      },
+      data: {
+        deletedAt: new Date(),
+      },
+    })
+
+    return await this.prisma.project.update({
       where: {
         id,
       },
