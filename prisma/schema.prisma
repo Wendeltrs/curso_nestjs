@@ -7,17 +7,64 @@ datasource db {
   url  	    = env("DATABASE_URL")
 }
 
+enum Role {
+  USER
+  ADMIN
+}
+
+model User {
+  id        String   @id @default(uuid()) @db.Uuid()
+  name      String   @db.VarChar(250)
+  email     String   @unique
+  password  String   @db.VarChar(250)
+  avatar    String?
+  role      Role     @default(USER)
+  createdAt DateTime @default(now())
+  updateAt  DateTime @updatedAt
+
+  projects       Project[] @relation("UserProjects")
+  tasksAssigned  Task[]    @relation("AssignedTasks")
+  comments       Comment[]
+  collaborations ProjectCollaborator[]
+
+  @@map("user")
+}
+
 model Project {
   id          String    @id @default(uuid()) @db.Uuid()
   name        String    @db.VarChar(250)
   description String?   @db.VarChar(250)
+  creatorId   String    @db.Uuid()
+  creator     User      @relation("UserProjects", fields: [creatorId], references: [id])
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt()
   deletedAt   DateTime?
 
-  tasks Task[]
+  tasks         Task[]
+  collaborators ProjectCollaborator[]
   
   @@map("project")
+}
+
+enum CollaboratorRole {
+  VIEWER
+  EDITOR
+  OWNER
+}
+
+model ProjectCollaborator {
+  id        String           @id @default(uuid()) @db.Uuid()
+  role      CollaboratorRole @default(EDITOR)
+  userId    String           @db.Uuid()
+  user      User             @relation(fields: [userId], references: [id])
+  projectId String           @db.Uuid()
+  project   Project          @relation(fields: [projectId], references: [id])
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt()
+  deletedAt DateTime?
+
+  @@unique([userId, projectId])
+  @@map("project_collaborator")
 }
 
 enum TaskStatus {
@@ -39,12 +86,29 @@ model Task {
   status      TaskStatus   @default(TODO)
   priority    TaskPriority @default(MEDIUM)
   dueDate     DateTime?
+  projectId   String       @db.Uuid()
+  project     Project      @relation(fields: [projectId], references: [id])
+  assigneeId  String?      @db.Uuid()
+  assignee    User?        @relation("AssignedTasks", fields: [assigneeId], references: [id])
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt()
   deletedAt   DateTime?
 
-  projectId String  @db.Uuid()
-  project   Project @relation(fields: [projectId], references: [id])
+  comments Comment[]
   
   @@map("task")
+}
+
+model Comment {
+  id        String   @id @default(uuid()) @db.Uuid()
+  content   String   @db.Text()
+  authorId  String   @db.Uuid()
+  author    User     @relation(fields: [authorId], references: [id])
+  taskId    String   @db.Uuid()
+  task      Task     @relation(fields: [taskId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+
+  @@map("comment")
 }
