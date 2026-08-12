@@ -1,87 +1,58 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, UnauthorizedException } from '@nestjs/common'
+import { JwtService } from '@nestjs/jwt'
+import * as bcrypt from 'bcrypt'
 import { PrismaService } from 'src/prisma/prisma.service'
-import { QueryDto } from 'src/services/query/query.decorator'
-import { UserCreateDTO, UserUpdateDTO } from './auth.dto'
+import { UsersService } from '../users/users.service'
+import { SignInDTO, SignUpDTO } from './auth.dto'
 
 @Injectable()
 export class AuthService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private usersService: UsersService,
+    private jwtService: JwtService,
+    private prisma: PrismaService,
+  ) {}
 
-  public async getAll(query?: QueryDto) {
-    return await this.prisma.user.findMany({
-      skip: query?.skip,
-      take: query?.take,
-      orderBy: query?.orderBy,
-      where: {
-        ...query?.where,
-        deletedAt: null,
-      },
-      include: {
-        projects: true,
-        collaborations: true,
-        comments: true,
-        tasksAssigned: true,
-      },
+  public async signUp(data: SignUpDTO) {
+    const hashedPassword = await bcrypt.hash(data.password, 12)
+
+    const newUser = await this.usersService.create({
+      ...data,
+      password: hashedPassword,
     })
+
+    const token = this.jwtService.sign({
+      sub: newUser.id,
+      email: newUser.email,
+      role: newUser.role,
+    })
+
+    return {
+      token: token,
+    }
   }
 
-  public async get(id: string) {
-    return await this.prisma.user.findFirst({
-      where: {
-        id,
-        deletedAt: null,
-      },
-      include: {
-        projects: true,
-        collaborations: true,
-        comments: true,
-        tasksAssigned: true,
-      },
-    })
-  }
+  public async signIn(data: SignInDTO) {
+    const user = await this.usersService.getEmail(data.email)
 
-  public async create(data: UserCreateDTO) {
-    return await this.prisma.user.create({
-      data: {
-        name: data.name,
-        email: data.email,
-        password: data.password,
-      },
-    })
-  }
+    if (user && (await bcrypt.compare(data.password, user.password))) {
+      const token = this.jwtService.sign({
+        sub: user.id,
+        email: user.email,
+        role: user.role,
+      })
 
-  public async update(id: string, data: UserUpdateDTO) {
-    return await this.prisma.user.update({
-      where: {
-        id,
-      },
-      data: {
-        name: data.name,
-        email: data.email,
-        password: data.password,
-      },
-    })
-  }
+      return {
+        token: token,
+        user: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+        },
+      }
+    }
 
-  //   public async changeAvatar(id: string, file: ChangeAvatarDTO) {
-  //     return await this.prisma.user.update({
-  //       where: {
-  //         id,
-  //       },
-  //       data: {
-  //         avatar: file,
-  //       },
-  //     })
-  //   }
-
-  public async delete(id: string) {
-    return await this.prisma.user.update({
-      where: {
-        id,
-      },
-      data: {
-        deletedAt: new Date(),
-      },
-    })
+    throw new UnauthorizedException()
   }
 }

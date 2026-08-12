@@ -1,49 +1,22 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { Role } from '@prisma/client'
-import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator'
-import { FileData } from 'src/common/decorators/upload/upload.decorator'
-import { ProjectCollaboratorDTO } from '../project-collaborators/project-collaborators.dto'
-import { ProjectDTO } from '../projects/projects.dto'
-import { TasksDTO } from '../tasks/tasks.dto'
+import { IsEmail, IsEnum, IsNotEmpty, IsOptional, IsString, MinLength } from 'class-validator'
 
-export class UsersDTO {
-  @ApiProperty() id: string
-  @ApiProperty() name: string
-  @ApiProperty() email: string
-  @ApiProperty({ enum: Role, default: Role.USER }) role: Role
-  @ApiProperty({ format: 'date-time' }) createdAt: string
-  @ApiProperty({ format: 'date-time' }) updatedAt: string
-  @ApiProperty({ format: 'date-time' }) deletedAt: string
-}
-
-export class UsersFullDTO {
-  @ApiProperty() id: string
-  @ApiProperty() name: string
-  @ApiProperty() email: string
-  @ApiProperty({ enum: Role, default: Role.USER }) role: Role
-  @ApiProperty({ type: () => [ProjectDTO] }) projects: ProjectDTO[]
-  @ApiProperty({ type: () => [TasksDTO] }) tasksAssigned: TasksDTO[]
-  // @ApiProperty({ type: () => CommentDTO }) comments: CommentDTO
-  @ApiProperty({ type: () => ProjectCollaboratorDTO }) collaborations: ProjectCollaboratorDTO
-  @ApiProperty({ format: 'date-time' }) createdAt: string
-  @ApiProperty({ format: 'date-time' }) updatedAt: string
-  @ApiProperty({ format: 'date-time' }) deletedAt: string
-}
-
-export class UserCreateDTO {
+export class SignUpDTO {
   @ApiProperty({ description: 'User name' })
   @IsString()
   @IsNotEmpty()
   name: string
 
-  @ApiProperty({ description: 'User email' })
-  @IsString()
+  @ApiProperty({ description: 'User email', uniqueItems: true })
+  @IsEmail()
   @IsNotEmpty()
   email: string
 
-  @ApiProperty({ description: 'User password' })
+  @ApiProperty({ description: 'User password', minLength: 8 })
   @IsString()
   @IsNotEmpty()
+  @MinLength(8)
   password: string
 
   @ApiProperty({
@@ -57,31 +30,35 @@ export class UserCreateDTO {
   role?: Role = Role.USER
 }
 
-export class UserUpdateDTO {
-  @ApiProperty({ description: 'User name' })
-  @IsString()
-  @IsOptional()
-  name: string
-
-  @ApiProperty({ description: 'User email' })
-  @IsString()
-  @IsOptional()
+export class SignInDTO {
+  @ApiProperty({ description: 'User email', uniqueItems: true })
+  @IsEmail()
+  @IsNotEmpty()
   email: string
 
-  @ApiProperty({ description: 'User password' })
+  @ApiProperty({ description: 'User password', minLength: 8 })
   @IsString()
-  @IsOptional()
+  @IsNotEmpty()
+  @MinLength(8)
   password: string
-
-  @ApiProperty({
-    description: 'User role',
-    enum: Role,
-    default: Role.USER,
-    required: false,
-  })
-  @IsEnum(Role)
-  @IsOptional()
-  role?: Role = Role.USER
 }
 
-export type ChangeAvatarDTO = FileData
+export class ForgotPasswordDTO {
+  @ApiProperty({ description: 'User email', uniqueItems: true })
+  @IsEmail()
+  @IsNotEmpty()
+  email: string
+}
+
+export class ResetPasswordDTO {
+  @ApiProperty({ description: 'Reset Token' })
+  @IsString()
+  @IsNotEmpty()
+  token: string
+
+  @ApiProperty({ description: 'New password', minLength: 8 })
+  @IsString()
+  @IsNotEmpty()
+  @MinLength(8)
+  newPassword: string
+}

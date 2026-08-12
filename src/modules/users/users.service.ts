@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import { PrismaService } from 'src/prisma/prisma.service'
 import { QueryDto } from 'src/services/query/query.decorator'
 import { UserCreateDTO, UserUpdateDTO } from './users.dto'
@@ -41,7 +41,7 @@ export class UsersService {
   }
 
   public async getEmail(email: string) {
-    const user = await this.prisma.user.findFirst({
+    return await this.prisma.user.findFirst({
       where: {
         email,
         deletedAt: null,
@@ -53,12 +53,6 @@ export class UsersService {
         tasksAssigned: true,
       },
     })
-
-    if (!user) {
-      throw new NotFoundException('User not found')
-    }
-
-    return user
   }
 
   public async create(data: UserCreateDTO) {
@@ -66,6 +60,7 @@ export class UsersService {
       data: {
         name: data.name,
         email: data.email,
+        role: data.role,
         password: data.password,
       },
     })
@@ -79,7 +74,6 @@ export class UsersService {
       data: {
         name: data.name,
         email: data.email,
-        password: data.password,
       },
     })
   }
