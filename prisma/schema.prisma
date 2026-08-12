@@ -21,6 +21,7 @@ model User {
   role      Role     @default(USER)
   createdAt DateTime @default(now())
   updateAt  DateTime @updatedAt
+  deletedAt DateTime?
 
   projects       Project[] @relation("UserProjects")
   tasksAssigned  Task[]    @relation("AssignedTasks")

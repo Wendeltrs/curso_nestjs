@@ -1,12 +1,23 @@
 import { Module } from '@nestjs/common'
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
+import { AuthModule } from './modules/auth/auth.module'
+import { CommentsModule } from './modules/comments/comments.module'
+import { ProjectCollaboratorsModule } from './modules/project-collaborators/project-collaborators.module'
 import { ProjectsModule } from './modules/projects/projects.module'
 import { TasksModule } from './modules/tasks/tasks.module'
+import { UsersModule } from './modules/users/users.module'
 import { PrismaService } from './prisma/prisma.service'
 
 @Module({
-  imports: [ProjectsModule, TasksModule],
+  imports: [
+    ProjectsModule,
+    TasksModule,
+    UsersModule,
+    ProjectCollaboratorsModule,
+    CommentsModule,
+    AuthModule,
+  ],
   controllers: [AppController],
   providers: [AppService, PrismaService],
 })

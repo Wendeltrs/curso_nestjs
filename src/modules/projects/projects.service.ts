@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common'
+import { CollaboratorRole } from '@prisma/client'
 import { PrismaService } from 'src/prisma/prisma.service'
 import { QueryDto } from 'src/services/query/query.decorator'
 import { ProjectCreateDTO, ProjectUpdateDTO } from './projects.dto'
@@ -9,12 +10,16 @@ export class ProjectsService {
 
   public async getAll(query: QueryDto) {
     return await this.prisma.project.findMany({
+      skip: query?.skip,
+      take: query?.take,
+      orderBy: query?.orderBy,
       where: {
         ...query.where,
         deletedAt: null,
       },
       include: {
         tasks: true,
+        creator: true,
       },
     })
   }
@@ -27,17 +32,29 @@ export class ProjectsService {
       },
       include: {
         tasks: true,
+        creator: true,
       },
     })
   }
 
   public async create(data: ProjectCreateDTO) {
-    return await this.prisma.project.create({
+    const project = await this.prisma.project.create({
       data: {
         name: data.name,
         description: data.description,
+        creatorId: data.creatorId,
       },
     })
+
+    await this.prisma.projectCollaborator.create({
+      data: {
+        userId: data.creatorId,
+        projectId: project.id,
+        role: CollaboratorRole.OWNER,
+      },
+    })
+
+    return project
   }
 
   public async update(id: string, data: ProjectUpdateDTO) {
@@ -48,6 +65,7 @@ export class ProjectsService {
       data: {
         name: data.name,
         description: data.description,
+        creatorId: data.creatorId,
       },
     })
   }

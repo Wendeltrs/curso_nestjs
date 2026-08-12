@@ -26,6 +26,10 @@ export class ValidateResourcesIdsInterceptor implements NestInterceptor {
 
     const request = context.switchToHttp().getRequest()
     const projectId = request.params.projectId
+    const taskId = request.params.taskId
+    const userId = request.params.userId
+    const commentId = request.params.commentId
+    const collaboratorId = request.params.collaboratorId
 
     if (projectId) {
       const project = await this.prisma.project.findFirst({
@@ -40,8 +44,6 @@ export class ValidateResourcesIdsInterceptor implements NestInterceptor {
       }
     }
 
-    const taskId = request.params.taskId
-
     if (taskId) {
       const task = await this.prisma.task.findFirst({
         where: {
@@ -52,6 +54,45 @@ export class ValidateResourcesIdsInterceptor implements NestInterceptor {
 
       if (!task) {
         throw new NotFoundException('Task not found')
+      }
+    }
+
+    if (userId) {
+      const user = await this.prisma.user.findFirst({
+        where: {
+          id: userId,
+          deletedAt: null,
+        },
+      })
+
+      if (!user) {
+        throw new NotFoundException('User not found')
+      }
+    }
+
+    if (commentId) {
+      const comment = await this.prisma.comment.findFirst({
+        where: {
+          id: commentId,
+          deletedAt: null,
+        },
+      })
+
+      if (!comment) {
+        throw new NotFoundException('Comment not found')
+      }
+    }
+
+    if (collaboratorId) {
+      const collaborator = await this.prisma.projectCollaborator.findFirst({
+        where: {
+          id: collaboratorId,
+          deletedAt: null,
+        },
+      })
+
+      if (!collaborator) {
+        throw new NotFoundException('Collaborator not found')
       }
     }
 

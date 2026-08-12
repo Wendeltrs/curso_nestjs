@@ -15,6 +15,8 @@ export class TasksService {
       },
       include: {
         project: true,
+        assignee: true,
+        comments: true,
       },
     })
   }
@@ -39,6 +41,8 @@ export class TasksService {
       },
       include: {
         project: true,
+        assignee: true,
+        comments: true,
       },
     })
   }
@@ -52,6 +56,7 @@ export class TasksService {
         priority: data.priority,
         projectId: data.projectId,
         dueDate: data.dueDate,
+        assigneeId: data.assineeId,
       },
     })
   }
@@ -68,6 +73,7 @@ export class TasksService {
         priority: data.priority,
         projectId: data.projectId,
         dueDate: data.dueDate,
+        assigneeId: data.assineeId,
       },
     })
   }

@@ -1,7 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { TaskPriority, TaskStatus } from '@prisma/client'
 import { IsDateString, IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator'
+import { CommentDTO } from '../comments/comments.dto'
 import { ProjectDTO } from '../projects/projects.dto'
+import { UsersDTO } from '../users/users.dto'
 
 export class TasksDTO {
   @ApiProperty() id: string
@@ -10,24 +12,17 @@ export class TasksDTO {
   @ApiProperty({ enum: TaskStatus, default: TaskStatus.TODO }) status: TaskStatus
   @ApiProperty({ enum: TaskPriority, default: TaskPriority.MEDIUM }) priority: TaskPriority
   @ApiProperty() projectId: string
+  @ApiProperty() assineeId: string
   @ApiProperty({ format: 'date-time' }) dueDate: string
   @ApiProperty({ format: 'date-time' }) createdAt: string
   @ApiProperty({ format: 'date-time' }) updatedAt: string
   @ApiProperty({ format: 'date-time' }) deletedAt: string
 }
 
-export class TasksFullDTO {
-  @ApiProperty() id: string
-  @ApiProperty() title: string
-  @ApiProperty() description: string
-  @ApiProperty({ enum: TaskStatus, default: TaskStatus.TODO }) status: TaskStatus
-  @ApiProperty({ enum: TaskPriority, default: TaskPriority.MEDIUM }) priority: TaskPriority
-  @ApiProperty() projectId: string
+export class TasksFullDTO extends TasksDTO {
   @ApiProperty({ type: () => ProjectDTO }) project: ProjectDTO
-  @ApiProperty({ format: 'date-time' }) dueDate: string
-  @ApiProperty({ format: 'date-time' }) createdAt: string
-  @ApiProperty({ format: 'date-time' }) updatedAt: string
-  @ApiProperty({ format: 'date-time' }) deletedAt: string
+  @ApiProperty({ type: () => UsersDTO }) assinee: UsersDTO
+  @ApiProperty({ type: () => [CommentDTO] }) comments: CommentDTO[]
 }
 
 export class TaskCreateDTO {
@@ -40,6 +35,11 @@ export class TaskCreateDTO {
   @IsString()
   @IsOptional()
   description?: string
+
+  @ApiProperty({ description: 'Task assignee', required: false })
+  @IsString()
+  @IsOptional()
+  assineeId?: string
 
   @ApiProperty({
     description: 'Task status',
@@ -73,7 +73,7 @@ export class TaskCreateDTO {
 }
 
 export class TaskUpdateDTO {
-  @ApiProperty({ description: 'Task title' })
+  @ApiProperty({ description: 'Task title', required: false })
   @IsString()
   @IsOptional()
   title: string
@@ -82,6 +82,11 @@ export class TaskUpdateDTO {
   @IsString()
   @IsOptional()
   description?: string
+
+  @ApiProperty({ description: 'Task assignee', required: false })
+  @IsString()
+  @IsOptional()
+  assineeId?: string
 
   @ApiProperty({
     description: 'Task status',
@@ -103,7 +108,7 @@ export class TaskUpdateDTO {
   @IsOptional()
   priority?: TaskPriority = TaskPriority.MEDIUM
 
-  @ApiProperty({ description: 'Project id' })
+  @ApiProperty({ description: 'Project id', required: false })
   @IsString()
   @IsOptional()
   projectId: string

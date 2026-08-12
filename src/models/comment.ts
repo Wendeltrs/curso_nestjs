@@ -1,32 +1,27 @@
 import { Expose, Type } from 'class-transformer'
 import { Task } from './task'
 import { User } from './user'
-import { Collaborator } from './collaborator'
 
-export class Project {
+export class Comment {
   @Expose()
   id: string
 
   @Expose()
-  name: string
+  content: string
 
   @Expose()
-  description: string
-
-  @Expose()
-  creatorId: string
+  authorId: string
 
   @Expose()
   @Type(() => User)
-  creator: User
+  author: User
+
+  @Expose()
+  taskId: string
 
   @Expose()
   @Type(() => Task)
-  tasks: Task[]
-
-  @Expose()
-  @Type(() => Collaborator)
-  collaborators: Collaborator[]
+  task: Task
 
   @Expose()
   createdAt: Date
