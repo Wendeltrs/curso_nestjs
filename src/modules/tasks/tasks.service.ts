@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
+import { QueryDto } from 'src/common/services/query/query.decorator'
 import { PrismaService } from 'src/prisma/prisma.service'
-import { QueryDto } from 'src/services/query/query.decorator'
 import { TaskCreateDTO, TaskUpdateDTO } from './tasks.dto'
 
 @Injectable()

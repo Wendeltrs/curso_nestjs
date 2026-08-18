@@ -1,12 +1,16 @@
 import { Injectable } from '@nestjs/common'
 import { CollaboratorRole } from '@prisma/client'
+import { QueryDto } from 'src/common/services/query/query.decorator'
+import { SessionService } from 'src/common/services/session/session.service'
 import { PrismaService } from 'src/prisma/prisma.service'
-import { QueryDto } from 'src/services/query/query.decorator'
 import { ProjectCreateDTO, ProjectUpdateDTO } from './projects.dto'
 
 @Injectable()
 export class ProjectsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private session: SessionService,
+  ) {}
 
   public async getAll(query: QueryDto) {
     return await this.prisma.project.findMany({
@@ -15,6 +19,7 @@ export class ProjectsService {
       orderBy: query?.orderBy,
       where: {
         ...query.where,
+        creatorId: this.session.getUserId(),
         deletedAt: null,
       },
       include: {
@@ -28,6 +33,7 @@ export class ProjectsService {
     return await this.prisma.project.findFirst({
       where: {
         id,
+        creatorId: this.session.getUserId(),
         deletedAt: null,
       },
       include: {
@@ -42,13 +48,13 @@ export class ProjectsService {
       data: {
         name: data.name,
         description: data.description,
-        creatorId: data.creatorId,
+        creatorId: this.session.getUserId(),
       },
     })
 
     await this.prisma.projectCollaborator.create({
       data: {
-        userId: data.creatorId,
+        userId: this.session.getUserId(),
         projectId: project.id,
         role: CollaboratorRole.OWNER,
       },
@@ -61,11 +67,11 @@ export class ProjectsService {
     return await this.prisma.project.update({
       where: {
         id,
+        creatorId: this.session.getUserId(),
       },
       data: {
         name: data.name,
         description: data.description,
-        creatorId: data.creatorId,
       },
     })
   }
@@ -83,6 +89,7 @@ export class ProjectsService {
     return await this.prisma.project.update({
       where: {
         id,
+        creatorId: this.session.getUserId(),
       },
       data: {
         deletedAt: new Date(),

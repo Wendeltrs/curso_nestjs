@@ -1,11 +1,15 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
+import { QueryDto } from 'src/common/services/query/query.decorator'
+import { SessionService } from 'src/common/services/session/session.service'
 import { PrismaService } from 'src/prisma/prisma.service'
-import { QueryDto } from 'src/services/query/query.decorator'
 import { CommentCreateDTO, CommentUpdateDTO } from './comments.dto'
 
 @Injectable()
 export class CommentsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private session: SessionService,
+  ) {}
 
   public async getAll(query: QueryDto) {
     return await this.prisma.comment.findMany({
@@ -52,26 +56,48 @@ export class CommentsService {
     return await this.prisma.comment.create({
       data: {
         content: data.content,
-        authorId: data.authorId,
+        authorId: this.session.getUserId(),
         taskId: data.taskId,
       },
     })
   }
 
   public async update(id: string, data: CommentUpdateDTO) {
+    const existingComment = await this.prisma.comment.findFirst({
+      where: {
+        id,
+        authorId: this.session.getUserId(),
+        deletedAt: null,
+      },
+    })
+
+    if (!existingComment) {
+      throw new NotFoundException('Comment not found')
+    }
+
     return await this.prisma.comment.update({
       where: {
         id,
       },
       data: {
         content: data.content,
-        authorId: data.authorId,
-        taskId: data.taskId,
       },
     })
   }
 
   public async delete(id: string) {
+    const existingComment = await this.prisma.comment.findFirst({
+      where: {
+        id,
+        authorId: this.session.getUserId(),
+        deletedAt: null,
+      },
+    })
+
+    if (!existingComment) {
+      throw new NotFoundException('Comment not found')
+    }
+
     return await this.prisma.comment.update({
       where: {
         id,

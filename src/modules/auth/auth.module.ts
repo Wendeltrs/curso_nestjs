@@ -5,6 +5,7 @@ import { PrismaService } from 'src/prisma/prisma.service'
 import { UsersService } from '../users/users.service'
 import { AuthController } from './auth.controller'
 import { AuthService } from './auth.service'
+import { JwtStrategy } from './jwt.strategy'
 
 @Module({
   imports: [
@@ -12,6 +13,6 @@ import { AuthService } from './auth.service'
     JwtModule.register({ secret: process.env.JWT_SECRET, signOptions: { expiresIn: '1d' } }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, PrismaService, UsersService],
+  providers: [AuthService, PrismaService, UsersService, JwtStrategy],
 })
 export class AuthModule {}

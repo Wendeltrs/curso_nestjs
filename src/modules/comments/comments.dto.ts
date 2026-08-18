@@ -24,11 +24,6 @@ export class CommentCreateDTO {
   @IsNotEmpty()
   content: string
 
-  @ApiProperty({ description: 'Author id' })
-  @IsString()
-  @IsNotEmpty()
-  authorId: string
-
   @ApiProperty({ description: 'Task id' })
   @IsString()
   @IsNotEmpty()
@@ -40,14 +35,4 @@ export class CommentUpdateDTO {
   @IsString()
   @IsOptional()
   content: string
-
-  @ApiProperty({ description: 'Author id', required: false })
-  @IsString()
-  @IsOptional()
-  authorId: string
-
-  @ApiProperty({ description: 'Task id', required: false })
-  @IsString()
-  @IsOptional()
-  taskId: string
 }

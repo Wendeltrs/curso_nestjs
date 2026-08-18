@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common'
 import { CollaboratorRole } from '@prisma/client'
+import { QueryDto } from 'src/common/services/query/query.decorator'
 import { PrismaService } from 'src/prisma/prisma.service'
-import { QueryDto } from 'src/services/query/query.decorator'
 import {
   ProjectCollaboratorCreateDTO,
   ProjectCollaboratorUpdateDTO,

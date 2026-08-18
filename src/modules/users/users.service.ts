@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
+import { QueryDto } from 'src/common/services/query/query.decorator'
 import { PrismaService } from 'src/prisma/prisma.service'
-import { QueryDto } from 'src/services/query/query.decorator'
 import { UserCreateDTO, UserUpdateDTO } from './users.dto'
 
 @Injectable()

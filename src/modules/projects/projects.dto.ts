@@ -30,11 +30,6 @@ export class ProjectCreateDTO {
   @IsString()
   @IsOptional()
   description: string
-
-  @ApiProperty({ description: 'Project creator' })
-  @IsString()
-  @IsNotEmpty()
-  creatorId: string
 }
 
 export class ProjectUpdateDTO {
@@ -47,9 +42,4 @@ export class ProjectUpdateDTO {
   @IsString()
   @IsOptional()
   description: string
-
-  @ApiProperty({ description: 'Project creator', required: false })
-  @IsString()
-  @IsOptional()
-  creatorId: string
 }
