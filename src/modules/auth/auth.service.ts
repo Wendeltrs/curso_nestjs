@@ -2,6 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import * as bcrypt from 'bcrypt'
 import { PrismaService } from 'src/prisma/prisma.service'
+import { MailService } from '../mail/mail.service'
 import { UsersService } from '../users/users.service'
 import { SignInDTO, SignUpDTO } from './auth.dto'
 
@@ -11,6 +12,7 @@ export class AuthService {
     private usersService: UsersService,
     private jwtService: JwtService,
     private prisma: PrismaService,
+    private mail: MailService,
   ) {}
 
   public async signUp(data: SignUpDTO) {
@@ -54,5 +56,49 @@ export class AuthService {
     }
 
     throw new UnauthorizedException()
+  }
+
+  public async forgotPassword(email: string) {
+    const user = await this.usersService.getEmail(email)
+
+    if (!user) {
+      throw new UnauthorizedException()
+    }
+
+    const token = this.jwtService.sign({
+      sub: user.id,
+      email: user.email,
+      porpuse: 'reset_password',
+    })
+
+    await this.mail.forgotPassword(email, token)
+
+    return {
+      message: 'Password request email sent',
+    }
+  }
+
+  public async resetPassword(token: string, newPassword: string) {
+    const payload = await this.jwtService.verify(token)
+    const user = await this.usersService.get(payload.sub)
+
+    if (payload.porpuse !== 'reset_password' && !user) {
+      throw new UnauthorizedException('Invalid token')
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 12)
+
+    await this.prisma.user.update({
+      where: {
+        id: payload.sub,
+      },
+      data: {
+        password: hashedPassword,
+      },
+    })
+
+    return {
+      message: 'Password updated',
+    }
   }
 }

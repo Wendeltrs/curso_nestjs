@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, UnauthorizedException } from '@nestjs/common'
 import { PassportStrategy } from '@nestjs/passport'
 import { ExtractJwt, Strategy } from 'passport-jwt'
 import { PrismaService } from 'src/prisma/prisma.service'
@@ -13,7 +13,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     })
   }
 
-  public async validate(payload: { sub: string }) {
+  public async validate(payload: { sub: string; porpuse: string }) {
+    if (payload.porpuse === 'reset_password') {
+      throw new UnauthorizedException('Invalid token')
+    }
+
     const user = await this.prisma.user.findUnique({
       where: {
         id: payload.sub,
