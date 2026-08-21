@@ -31,12 +31,4 @@ export class AuthController {
   public async resetPassword(@Body() data: ResetPasswordDTO) {
     return await this.authService.resetPassword(data.token, data.newPassword)
   }
-
-  @Get('protected')
-  @UseGuards(AuthGuard('jwt'))
-  public async protected(@AuthenticatedUser() user: User) {
-    return {
-      message: `Authenticated: ${user.email}`,
-    }
-  }
 }

@@ -44,6 +44,6 @@ import { MailService } from './mail.service'
   ],
   providers: [MailService],
   controllers: [MailConsumer],
-  exports: [MailService],
+  exports: [MailService, ClientsModule],
 })
 export class MailModule {}

@@ -12,7 +12,7 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common'
-import { ApiResponse } from '@nestjs/swagger'
+import { ApiBearerAuth, ApiResponse } from '@nestjs/swagger'
 import { Paginator } from 'src/common/decorators/paginator/paginator.decorator'
 import { Serializer } from 'src/common/decorators/serializer/serializer.decorator'
 import { ValidateResourcesIds } from 'src/common/decorators/validate-resources-ids/validate-resources-ids.decorator'
@@ -29,6 +29,7 @@ import { ProjectsService } from './projects.service'
 })
 @UseGuards(JwtAuthGuard)
 @UseInterceptors(ValidateResourcesIdsInterceptor)
+@ApiBearerAuth('jwt')
 export class ProjectsController {
   constructor(private projectsService: ProjectsService) {}
 
