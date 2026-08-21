@@ -13,8 +13,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     })
   }
 
-  public async validate(payload: { sub: string; porpuse: string }) {
-    if (payload.porpuse === 'reset_password') {
+  public async validate(payload: { sub: string; purpose: string }) {
+    if (payload.purpose === 'reset_password') {
       throw new UnauthorizedException('Invalid token')
     }
 

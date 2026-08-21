@@ -68,10 +68,10 @@ export class AuthService {
     const token = this.jwtService.sign({
       sub: user.id,
       email: user.email,
-      porpuse: 'reset_password',
+      purpose: 'reset_password',
     })
 
-    await this.mail.forgotPassword(email, token)
+    this.mail.forgotPassword(email, token)
 
     return {
       message: 'Password request email sent',
@@ -82,7 +82,7 @@ export class AuthService {
     const payload = await this.jwtService.verify(token)
     const user = await this.usersService.get(payload.sub)
 
-    if (payload.porpuse !== 'reset_password' && !user) {
+    if (payload.purpose !== 'reset_password' && !user) {
       throw new UnauthorizedException('Invalid token')
     }
 
