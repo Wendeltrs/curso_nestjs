@@ -8,10 +8,12 @@ import {
   Param,
   Post,
   Put,
+  UploadedFile,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common'
-import { ApiBearerAuth, ApiResponse } from '@nestjs/swagger'
+import { FileInterceptor } from '@nestjs/platform-express'
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiResponse } from '@nestjs/swagger'
 //import { Paginator } from 'src/common/decorators/paginator/paginator.decorator'
 import { Serializer } from 'src/common/decorators/serializer/serializer.decorator'
 import { ValidateResourcesIds } from 'src/common/decorators/validate-resources-ids/validate-resources-ids.decorator'
@@ -67,16 +69,36 @@ export class UsersController {
     return await this.usersService.update(id, data)
   }
 
-  //   @Patch(':userId/avatar')
-  //   @Upload()
-  //   public async changeAvatar(@Param('userId') id: string,@UploadedFile() file: ChangeAvatarDTO) {
-  //     return await this.usersService.changeAvatar(id, file)
-  //   }
-
   @Delete(':userId')
   @ValidateResourcesIds()
   @HttpCode(HttpStatus.NO_CONTENT)
   public async delete(@Param('userId') id: string) {
     return await this.usersService.delete(id)
+  }
+
+  @Post('/avatar')
+  @ApiResponse({
+    status: HttpStatus.OK,
+    type: UsersDTO,
+    description: 'User avatar uploaded successfully',
+  })
+  @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid data' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  @HttpCode(HttpStatus.OK)
+  @UseInterceptors(FileInterceptor('file'))
+  @Serializer(User)
+  public async uploadAvatar(@UploadedFile() file: Express.Multer.File) {
+    return await this.usersService.uploadAvatar(file)
   }
 }

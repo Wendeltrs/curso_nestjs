@@ -1,11 +1,13 @@
 import { Injectable } from '@nestjs/common'
+import { CloudinaryService } from 'src/common/services/cloudinary/cloudinary.service'
 import { QueryDto } from 'src/common/services/query/query.decorator'
+import { SessionService } from 'src/common/services/session/session.service'
 import { PrismaService } from 'src/prisma/prisma.service'
 import { UserCreateDTO, UserUpdateDTO } from './users.dto'
 
 @Injectable()
 export class UsersService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService, private session: SessionService, private cloudinary: CloudinaryService) {}
 
   public async getAll(query?: QueryDto) {
     return await this.prisma.user.findMany({
@@ -78,16 +80,19 @@ export class UsersService {
     })
   }
 
-  //   public async changeAvatar(id: string, file: ChangeAvatarDTO) {
-  //     return await this.prisma.user.update({
-  //       where: {
-  //         id,
-  //       },
-  //       data: {
-  //         avatar: file,
-  //       },
-  //     })
-  //   }
+  public async uploadAvatar(file: Express.Multer.File) {
+    const userId = this.session.userId
+    const result = await this.cloudinary.upload(file, userId)
+
+    return await this.prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        avatar: result.url,
+      },
+    })
+  }
 
   public async delete(id: string) {
     return await this.prisma.user.update({

@@ -18,6 +18,9 @@ export class User {
   role: string
 
   @Expose()
+  avatar: string
+
+  @Expose()
   @Type(() => Project)
   projects: Project[]
 
