@@ -29,7 +29,7 @@ import {
 } from './project-collaborators.dto'
 import { ProjectCollaboratorsService } from './project-collaborators.service'
 
-@Controller({ path: 'project-collaborators', version: '1' })
+@Controller({ path: 'collaborators', version: '1' })
 @UseGuards(JwtAuthGuard)
 @UseInterceptors(ValidateResourcesIdsInterceptor)
 @ApiBearerAuth('jwt')

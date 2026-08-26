@@ -1,11 +1,15 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { QueryDto } from 'src/common/decorators/query/query.decorator'
 import { PrismaService } from 'src/common/services/prisma/prisma.service'
+import { SessionService } from 'src/common/services/session/session.service'
 import { TaskCreateDTO, TaskUpdateDTO } from './tasks.dto'
 
 @Injectable()
 export class TasksService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private session: SessionService,
+  ) {}
 
   public async getAll(query?: QueryDto & { projectId: string }) {
     const project = await this.prisma.project.findFirst({
@@ -71,7 +75,7 @@ export class TasksService {
         priority: data.priority,
         projectId: data.projectId,
         dueDate: data.dueDate,
-        assigneeId: data.assineeId,
+        assigneeId: this.session.getUserId(),
       },
     })
   }
@@ -88,7 +92,6 @@ export class TasksService {
         priority: data.priority,
         projectId: data.projectId,
         dueDate: data.dueDate,
-        assigneeId: data.assineeId,
       },
     })
   }

@@ -1,5 +1,8 @@
-import { Body, Controller, HttpStatus, Post } from '@nestjs/common'
+import { Body, Controller, Get, HttpStatus, Post, UseGuards } from '@nestjs/common'
 import { ApiResponse } from '@nestjs/swagger'
+import { AuthenticatedUser } from 'src/common/decorators/authenticated-user/authenticated-user.decorator'
+import { JwtAuthGuard } from 'src/common/guards/jwt-auth/jwt-auth.guard'
+import { User } from 'src/models/user'
 import {
   AuthenticatedDTO,
   ForgotPasswordDTO,
@@ -9,6 +12,7 @@ import {
   SignUpDTO,
 } from './auth.dto'
 import { AuthService } from './auth.service'
+import { Serializer } from 'src/common/decorators/serializer/serializer.decorator'
 
 @Controller({ path: 'auth', version: '1' })
 export class AuthController {
@@ -36,5 +40,13 @@ export class AuthController {
   @ApiResponse({ status: HttpStatus.OK, type: MessageDTO })
   public async resetPassword(@Body() data: ResetPasswordDTO) {
     return await this.authService.resetPassword(data.token, data.newPassword)
+  }
+
+  @Get('/me')
+  @ApiResponse({ status: HttpStatus.OK, type: User })
+  @UseGuards(JwtAuthGuard)
+  @Serializer(User)
+  public async getMe(@AuthenticatedUser() user: User) {
+    return user
   }
 }
