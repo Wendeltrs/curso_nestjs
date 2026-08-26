@@ -9,13 +9,15 @@ import {
   ParseUUIDPipe,
   Post,
   Put,
+  Query,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common'
-import { ApiBearerAuth, ApiResponse } from '@nestjs/swagger'
+import { ApiBearerAuth, ApiNoContentResponse, ApiResponse } from '@nestjs/swagger'
 import { Paginator } from 'src/common/decorators/paginator/paginator.decorator'
 import { QueryDto, QueryPaginator } from 'src/common/decorators/query/query.decorator'
 import { Serializer } from 'src/common/decorators/serializer/serializer.decorator'
+import { ApiPaginatedResponse } from 'src/common/decorators/swagger/api-paginated-response.decorator'
 import { ValidateResourcesIds } from 'src/common/decorators/validate-resources-ids/validate-resources-ids.decorator'
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth/jwt-auth.guard'
 import { ValidateResourcesIdsInterceptor } from 'src/common/interceptors/validate-resources-ids/validate-resources-ids.interceptor'
@@ -31,29 +33,33 @@ export class TasksController {
   constructor(private tasksService: TasksService) {}
 
   @Get()
-  @ApiResponse({ type: [TasksFullDTO] })
+  @ApiPaginatedResponse(TasksFullDTO)
   @Paginator()
   @Serializer(Task)
-  public getAll(@QueryPaginator() query: QueryDto) {
-    return this.tasksService.getAll(query)
+  public getAll(@QueryPaginator() query: QueryDto, @Query('projectId') projectId: string) {
+    return this.tasksService.getAll({ ...query, projectId })
   }
 
   @Get(':taskId')
-  @ApiResponse({ type: TasksFullDTO })
+  @ApiResponse({ type: TasksFullDTO, status: HttpStatus.OK })
   @ValidateResourcesIds()
   @Serializer(Task)
-  public get(@Param('taskId', ParseUUIDPipe) id: string, @QueryPaginator() query: QueryDto) {
-    return this.tasksService.get(id, query)
+  public get(
+    @Param('taskId', ParseUUIDPipe) id: string,
+    @QueryPaginator() query: QueryDto,
+    @Query('projectId') projectId: string,
+  ) {
+    return this.tasksService.get(id, { ...query, projectId })
   }
 
   @Post()
-  @ApiResponse({ type: TasksDTO })
+  @ApiResponse({ type: TasksDTO, status: HttpStatus.CREATED })
   public create(@Body() data: TaskCreateDTO) {
     return this.tasksService.create(data)
   }
 
   @Put(':taskId')
-  @ApiResponse({ type: TasksDTO })
+  @ApiResponse({ type: TasksDTO, status: HttpStatus.OK })
   @ValidateResourcesIds()
   public update(@Param('taskId', ParseUUIDPipe) id: string, @Body() data: TaskUpdateDTO) {
     return this.tasksService.update(id, data)
@@ -62,6 +68,7 @@ export class TasksController {
   @Delete(':taskId')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ValidateResourcesIds()
+  @ApiNoContentResponse({ description: 'Task deleted successfully' })
   public delete(@Param('taskId', ParseUUIDPipe) id: string) {
     return this.tasksService.delete(id)
   }

@@ -11,13 +11,25 @@ import {
 export class ProjectCollaboratorsService {
   constructor(private prisma: PrismaService) {}
 
-  public async getAll(query?: QueryDto) {
+  public async getAll(query?: QueryDto & { projectId: string }) {
+    const project = await this.prisma.project.findFirst({
+      where: {
+        id: query?.projectId,
+        deletedAt: null,
+      },
+    })
+
+    if (!project) {
+      throw new NotFoundException('Project not found')
+    }
+
     return await this.prisma.extensions.projectCollaborator.findManyAndCount({
       skip: query?.skip,
       take: query?.take,
       orderBy: query?.orderBy,
       where: {
         ...query?.where,
+        projectId: project?.id,
         deletedAt: null,
       },
       include: {
@@ -27,10 +39,10 @@ export class ProjectCollaboratorsService {
     })
   }
 
-  public async get(id: string, query?: QueryDto) {
+  public async get(id: string, query?: QueryDto & { projectId: string }) {
     const project = await this.prisma.project.findFirst({
       where: {
-        id: query?.where?.projectId,
+        id: query?.projectId,
         deletedAt: null,
       },
     })

@@ -13,15 +13,22 @@ import {
   UseInterceptors,
 } from '@nestjs/common'
 import { FileInterceptor } from '@nestjs/platform-express'
-import { ApiBearerAuth, ApiBody, ApiConsumes, ApiResponse } from '@nestjs/swagger'
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
+  ApiNoContentResponse,
+  ApiResponse,
+} from '@nestjs/swagger'
 import { Paginator } from 'src/common/decorators/paginator/paginator.decorator'
 import { QueryDto, QueryPaginator } from 'src/common/decorators/query/query.decorator'
 import { Serializer } from 'src/common/decorators/serializer/serializer.decorator'
+import { ApiPaginatedResponse } from 'src/common/decorators/swagger/api-paginated-response.decorator'
 import { ValidateResourcesIds } from 'src/common/decorators/validate-resources-ids/validate-resources-ids.decorator'
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth/jwt-auth.guard'
 import { ValidateResourcesIdsInterceptor } from 'src/common/interceptors/validate-resources-ids/validate-resources-ids.interceptor'
 import { User } from 'src/models/user'
-import { UsersDTO, UsersFullDTO, UserUpdateDTO } from './users.dto'
+import { UserEmailDTO, UsersDTO, UsersFullDTO, UserUpdateDTO } from './users.dto'
 import { UsersService } from './users.service'
 
 @Controller({ path: 'users', version: '1' })
@@ -34,7 +41,7 @@ export class UsersController {
 
   @Get()
   @Paginator()
-  @ApiResponse({ status: HttpStatus.OK, type: [UsersFullDTO] })
+  @ApiPaginatedResponse(UsersFullDTO)
   public async getAll(@QueryPaginator() query?: QueryDto) {
     return await this.usersService.getAll(query)
   }
@@ -48,7 +55,7 @@ export class UsersController {
 
   @Get('/email')
   @ApiResponse({ status: HttpStatus.OK, type: UsersFullDTO })
-  public async getEmail(@Body() data: { email: string }) {
+  public async getEmail(@Body() data: UserEmailDTO) {
     return await this.usersService.getEmail(data.email)
   }
 
@@ -62,6 +69,7 @@ export class UsersController {
   @Delete(':userId')
   @ValidateResourcesIds()
   @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiNoContentResponse({ description: 'User deleted successfully' })
   public async delete(@Param('userId') id: string) {
     return await this.usersService.delete(id)
   }

@@ -12,10 +12,11 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common'
-import { ApiBearerAuth, ApiResponse } from '@nestjs/swagger'
+import { ApiBearerAuth, ApiNoContentResponse, ApiResponse } from '@nestjs/swagger'
 import { Paginator } from 'src/common/decorators/paginator/paginator.decorator'
 import { QueryDto, QueryPaginator } from 'src/common/decorators/query/query.decorator'
 import { Serializer } from 'src/common/decorators/serializer/serializer.decorator'
+import { ApiPaginatedResponse } from 'src/common/decorators/swagger/api-paginated-response.decorator'
 import { ValidateResourcesIds } from 'src/common/decorators/validate-resources-ids/validate-resources-ids.decorator'
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth/jwt-auth.guard'
 import { ValidateResourcesIdsInterceptor } from 'src/common/interceptors/validate-resources-ids/validate-resources-ids.interceptor'
@@ -34,7 +35,7 @@ export class ProjectsController {
   constructor(private projectsService: ProjectsService) {}
 
   @Get()
-  @ApiResponse({ type: [ProjectFullDTO] })
+  @ApiPaginatedResponse(ProjectFullDTO)
   @Paginator()
   @Serializer(Project)
   public getAll(@QueryPaginator() query: QueryDto) {
@@ -42,7 +43,7 @@ export class ProjectsController {
   }
 
   @Get(':projectId')
-  @ApiResponse({ type: ProjectFullDTO })
+  @ApiResponse({ type: ProjectFullDTO, status: HttpStatus.OK })
   @ValidateResourcesIds()
   @Serializer(Project)
   public get(@Param('projectId', ParseUUIDPipe) id: string) {
@@ -52,6 +53,7 @@ export class ProjectsController {
   @Post()
   @ApiResponse({
     type: ProjectDTO,
+    status: HttpStatus.CREATED,
   })
   public create(@Body() data: ProjectCreateDTO) {
     return this.projectsService.create(data)
@@ -60,6 +62,7 @@ export class ProjectsController {
   @Put(':projectId')
   @ApiResponse({
     type: ProjectDTO,
+    status: HttpStatus.OK,
   })
   @ValidateResourcesIds()
   public update(@Param('projectId', ParseUUIDPipe) id: string, @Body() data: ProjectUpdateDTO) {
@@ -69,6 +72,7 @@ export class ProjectsController {
   @Delete(':projectId')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ValidateResourcesIds()
+  @ApiNoContentResponse({ description: 'Project deleted successfully' })
   public delete(@Param('projectId', ParseUUIDPipe) id: string) {
     return this.projectsService.delete(id)
   }

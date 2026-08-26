@@ -11,13 +11,25 @@ export class CommentsService {
     private session: SessionService,
   ) {}
 
-  public async getAll(query?: QueryDto) {
+  public async getAll(query?: QueryDto & { taskId?: string }) {
+    const task = await this.prisma.task.findFirst({
+      where: {
+        id: query?.taskId,
+        deletedAt: null,
+      },
+    })
+
+    if (!task) {
+      throw new NotFoundException('Task not found')
+    }
+
     return await this.prisma.extensions.comment.findManyAndCount({
       skip: query?.skip,
       take: query?.take,
       orderBy: query?.orderBy,
       where: {
         ...query?.where,
+        taskId: task?.id,
         deletedAt: null,
       },
       include: {
@@ -27,10 +39,10 @@ export class CommentsService {
     })
   }
 
-  public async get(id: string, query: QueryDto) {
+  public async get(id: string, query?: QueryDto & { taskId?: string }) {
     const task = await this.prisma.task.findFirst({
       where: {
-        id: query?.where?.taskId,
+        id: query?.taskId,
         deletedAt: null,
       },
     })

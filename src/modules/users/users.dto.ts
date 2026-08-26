@@ -23,6 +23,13 @@ export class UsersFullDTO extends UsersDTO {
   @ApiProperty({ type: () => [ProjectCollaboratorDTO] }) collaborations: ProjectCollaboratorDTO[]
 }
 
+export class UserEmailDTO {
+  @ApiProperty({ description: 'User email', uniqueItems: true })
+  @IsEmail()
+  @IsNotEmpty()
+  email: string
+}
+
 export class UserCreateDTO {
   @ApiProperty({ description: 'User name' })
   @IsString()
@@ -54,17 +61,17 @@ export class UserUpdateDTO {
   @ApiProperty({ description: 'User name' })
   @IsString()
   @IsOptional()
-  name: string
+  name?: string
 
   @ApiProperty({ description: 'User email' })
   @IsEmail()
   @IsOptional()
-  email: string
+  email?: string
 
   @ApiProperty({ description: 'User password' })
   @IsString()
   @IsOptional()
-  password: string
+  password?: string
 
   @ApiProperty({
     description: 'User role',

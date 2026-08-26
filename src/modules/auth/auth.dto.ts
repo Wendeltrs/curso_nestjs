@@ -62,3 +62,19 @@ export class ResetPasswordDTO {
   @MinLength(8)
   newPassword: string
 }
+
+class UserAuthenticated {
+  @ApiProperty() id: string
+  @ApiProperty() name: string
+  @ApiProperty() email: string
+  @ApiProperty({ enum: Role, default: Role.USER }) role: Role
+}
+
+export class AuthenticatedDTO {
+  @ApiProperty() token: string
+  @ApiProperty({ type: () => UserAuthenticated }) user: UserAuthenticated
+}
+
+export class MessageDTO {
+  @ApiProperty() message: string
+}

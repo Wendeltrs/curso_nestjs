@@ -9,13 +9,15 @@ import {
   ParseUUIDPipe,
   Post,
   Put,
+  Query,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common'
-import { ApiBearerAuth, ApiResponse } from '@nestjs/swagger'
+import { ApiBearerAuth, ApiNoContentResponse, ApiResponse } from '@nestjs/swagger'
 import { Paginator } from 'src/common/decorators/paginator/paginator.decorator'
 import { QueryDto, QueryPaginator } from 'src/common/decorators/query/query.decorator'
 import { Serializer } from 'src/common/decorators/serializer/serializer.decorator'
+import { ApiPaginatedResponse } from 'src/common/decorators/swagger/api-paginated-response.decorator'
 import { ValidateResourcesIds } from 'src/common/decorators/validate-resources-ids/validate-resources-ids.decorator'
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth/jwt-auth.guard'
 import { ValidateResourcesIdsInterceptor } from 'src/common/interceptors/validate-resources-ids/validate-resources-ids.interceptor'
@@ -31,24 +33,29 @@ export class CommentsController {
   constructor(private commentsService: CommentsService) {}
 
   @Get()
-  @ApiResponse({ type: [CommentFullDTO] })
+  @ApiPaginatedResponse(CommentFullDTO)
   @Paginator()
   @Serializer(Comment)
-  public getAll(@QueryPaginator() query?: QueryDto) {
-    return this.commentsService.getAll(query)
+  public getAll(@QueryPaginator() query: QueryDto, @Query('taskId') taskId: string) {
+    return this.commentsService.getAll({ ...query, taskId })
   }
 
   @Get(':commentId')
-  @ApiResponse({ type: CommentFullDTO })
+  @ApiResponse({ type: CommentFullDTO, status: HttpStatus.OK })
   @ValidateResourcesIds()
   @Serializer(Comment)
-  public get(@Param('commentId', ParseUUIDPipe) id: string, @QueryPaginator() query: QueryDto) {
-    return this.commentsService.get(id, query)
+  public get(
+    @Param('commentId', ParseUUIDPipe) id: string,
+    @QueryPaginator() query: QueryDto,
+    @Query('taskId') taskId: string,
+  ) {
+    return this.commentsService.get(id, { ...query, taskId })
   }
 
   @Post()
   @ApiResponse({
     type: CommentDTO,
+    status: HttpStatus.CREATED,
   })
   public create(@Body() data: CommentCreateDTO) {
     return this.commentsService.create(data)
@@ -57,6 +64,7 @@ export class CommentsController {
   @Put(':commentId')
   @ApiResponse({
     type: CommentDTO,
+    status: HttpStatus.OK,
   })
   @ValidateResourcesIds()
   public update(@Param('commentId', ParseUUIDPipe) id: string, @Body() data: CommentUpdateDTO) {
@@ -66,6 +74,7 @@ export class CommentsController {
   @Delete(':commentId')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ValidateResourcesIds()
+  @ApiNoContentResponse({ description: 'Comment deleted successfully' })
   public delete(@Param('commentId', ParseUUIDPipe) id: string) {
     return this.commentsService.delete(id)
   }
