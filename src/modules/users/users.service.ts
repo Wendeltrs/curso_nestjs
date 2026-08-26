@@ -1,16 +1,20 @@
 import { Injectable } from '@nestjs/common'
+import { QueryDto } from 'src/common/decorators/query/query.decorator'
 import { CloudinaryService } from 'src/common/services/cloudinary/cloudinary.service'
-import { QueryDto } from 'src/common/services/query/query.decorator'
+import { PrismaService } from 'src/common/services/prisma/prisma.service'
 import { SessionService } from 'src/common/services/session/session.service'
-import { PrismaService } from 'src/prisma/prisma.service'
 import { UserCreateDTO, UserUpdateDTO } from './users.dto'
 
 @Injectable()
 export class UsersService {
-  constructor(private prisma: PrismaService, private session: SessionService, private cloudinary: CloudinaryService) {}
+  constructor(
+    private prisma: PrismaService,
+    private session: SessionService,
+    private cloudinary: CloudinaryService,
+  ) {}
 
   public async getAll(query?: QueryDto) {
-    return await this.prisma.user.findMany({
+    return await this.prisma.extensions.user.findManyAndCount({
       skip: query?.skip,
       take: query?.take,
       orderBy: query?.orderBy,

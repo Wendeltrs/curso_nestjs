@@ -13,12 +13,12 @@ import {
   UseInterceptors,
 } from '@nestjs/common'
 import { ApiBearerAuth, ApiResponse } from '@nestjs/swagger'
-//import { Paginator } from 'src/common/decorators/paginator/paginator.decorator'
+import { Paginator } from 'src/common/decorators/paginator/paginator.decorator'
+import { QueryDto, QueryPaginator } from 'src/common/decorators/query/query.decorator'
 import { Serializer } from 'src/common/decorators/serializer/serializer.decorator'
 import { ValidateResourcesIds } from 'src/common/decorators/validate-resources-ids/validate-resources-ids.decorator'
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth/jwt-auth.guard'
 import { ValidateResourcesIdsInterceptor } from 'src/common/interceptors/validate-resources-ids/validate-resources-ids.interceptor'
-import { QueryDto, QueryPaginator } from 'src/common/services/query/query.decorator'
 import { Task } from 'src/models/task'
 import { TaskCreateDTO, TasksDTO, TasksFullDTO, TaskUpdateDTO } from './tasks.dto'
 import { TasksService } from './tasks.service'
@@ -32,7 +32,7 @@ export class TasksController {
 
   @Get()
   @ApiResponse({ type: [TasksFullDTO] })
-  // @Paginator()
+  @Paginator()
   @Serializer(Task)
   public getAll(@QueryPaginator() query: QueryDto) {
     return this.tasksService.getAll(query)

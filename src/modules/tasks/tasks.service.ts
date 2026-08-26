@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
-import { QueryDto } from 'src/common/services/query/query.decorator'
-import { PrismaService } from 'src/prisma/prisma.service'
+import { QueryDto } from 'src/common/decorators/query/query.decorator'
+import { PrismaService } from 'src/common/services/prisma/prisma.service'
 import { TaskCreateDTO, TaskUpdateDTO } from './tasks.dto'
 
 @Injectable()
@@ -8,7 +8,10 @@ export class TasksService {
   constructor(private prisma: PrismaService) {}
 
   public async getAll(query: QueryDto) {
-    return await this.prisma.task.findMany({
+    return await this.prisma.extensions.task.findManyAndCount({
+      skip: query?.skip,
+      take: query?.take,
+      orderBy: query?.orderBy,
       where: {
         ...query.where,
         deletedAt: null,

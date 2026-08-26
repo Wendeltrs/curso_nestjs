@@ -12,12 +12,12 @@ import {
   UseInterceptors,
 } from '@nestjs/common'
 import { ApiBearerAuth, ApiResponse } from '@nestjs/swagger'
-//import { Paginator } from 'src/common/decorators/paginator/paginator.decorator'
+import { Paginator } from 'src/common/decorators/paginator/paginator.decorator'
+import { QueryDto, QueryPaginator } from 'src/common/decorators/query/query.decorator'
 import { Serializer } from 'src/common/decorators/serializer/serializer.decorator'
 import { ValidateResourcesIds } from 'src/common/decorators/validate-resources-ids/validate-resources-ids.decorator'
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth/jwt-auth.guard'
 import { ValidateResourcesIdsInterceptor } from 'src/common/interceptors/validate-resources-ids/validate-resources-ids.interceptor'
-import { QueryDto, QueryPaginator } from 'src/common/services/query/query.decorator'
 import { Collaborator } from 'src/models/collaborator'
 import {
   ProjectCollaboratorCreateDTO,
@@ -35,7 +35,7 @@ export class ProjectCollaboratorsController {
   constructor(private projectCollaboratorsService: ProjectCollaboratorsService) {}
 
   @Get()
-  // @Paginator()
+  @Paginator()
   @Serializer(Collaborator)
   @ApiResponse({ status: HttpStatus.OK, type: [ProjectCollaboratorFullDTO] })
   public async getAll(@QueryPaginator() query?: QueryDto) {

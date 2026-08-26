@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common'
 import { CollaboratorRole } from '@prisma/client'
-import { QueryDto } from 'src/common/services/query/query.decorator'
+import { QueryDto } from 'src/common/decorators/query/query.decorator'
+import { PrismaService } from 'src/common/services/prisma/prisma.service'
 import { SessionService } from 'src/common/services/session/session.service'
-import { PrismaService } from 'src/prisma/prisma.service'
 import { ProjectCreateDTO, ProjectUpdateDTO } from './projects.dto'
 
 @Injectable()
@@ -13,7 +13,7 @@ export class ProjectsService {
   ) {}
 
   public async getAll(query: QueryDto) {
-    return await this.prisma.project.findMany({
+    return await this.prisma.extensions.project.findManyAndCount({
       skip: query?.skip,
       take: query?.take,
       orderBy: query?.orderBy,

@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common'
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
 import { CloudinaryService } from './common/services/cloudinary/cloudinary.service'
+import { PrismaService } from './common/services/prisma/prisma.service'
 import { SessionService } from './common/services/session/session.service'
 import { AuthModule } from './modules/auth/auth.module'
 import { CommentsModule } from './modules/comments/comments.module'
@@ -10,7 +11,6 @@ import { ProjectCollaboratorsModule } from './modules/project-collaborators/proj
 import { ProjectsModule } from './modules/projects/projects.module'
 import { TasksModule } from './modules/tasks/tasks.module'
 import { UsersModule } from './modules/users/users.module'
-import { PrismaService } from './prisma/prisma.service'
 
 @Module({
   imports: [

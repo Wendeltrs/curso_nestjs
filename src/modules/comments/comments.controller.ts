@@ -13,12 +13,12 @@ import {
   UseInterceptors,
 } from '@nestjs/common'
 import { ApiBearerAuth, ApiResponse } from '@nestjs/swagger'
-//import { Paginator } from 'src/common/decorators/paginator/paginator.decorator'
+import { Paginator } from 'src/common/decorators/paginator/paginator.decorator'
+import { QueryDto, QueryPaginator } from 'src/common/decorators/query/query.decorator'
 import { Serializer } from 'src/common/decorators/serializer/serializer.decorator'
 import { ValidateResourcesIds } from 'src/common/decorators/validate-resources-ids/validate-resources-ids.decorator'
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth/jwt-auth.guard'
 import { ValidateResourcesIdsInterceptor } from 'src/common/interceptors/validate-resources-ids/validate-resources-ids.interceptor'
-import { QueryDto, QueryPaginator } from 'src/common/services/query/query.decorator'
 import { Comment } from 'src/models/comment'
 import { CommentCreateDTO, CommentDTO, CommentFullDTO, CommentUpdateDTO } from './comments.dto'
 import { CommentsService } from './comments.service'
@@ -32,9 +32,9 @@ export class CommentsController {
 
   @Get()
   @ApiResponse({ type: [CommentFullDTO] })
-  // @Paginator()
+  @Paginator()
   @Serializer(Comment)
-  public getAll(@QueryPaginator() query: QueryDto) {
+  public getAll(@QueryPaginator() query?: QueryDto) {
     return this.commentsService.getAll(query)
   }
 

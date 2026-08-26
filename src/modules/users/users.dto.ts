@@ -1,7 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { Role } from '@prisma/client'
 import { IsEmail, IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator'
-import { FileData } from 'src/common/decorators/upload/upload.decorator'
 import { CommentDTO } from '../comments/comments.dto'
 import { ProjectCollaboratorDTO } from '../project-collaborators/project-collaborators.dto'
 import { ProjectDTO } from '../projects/projects.dto'
@@ -77,5 +76,3 @@ export class UserUpdateDTO {
   @IsOptional()
   role?: Role = Role.USER
 }
-
-export type ChangeAvatarDTO = FileData

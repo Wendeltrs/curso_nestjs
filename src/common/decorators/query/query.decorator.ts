@@ -1,5 +1,5 @@
 import { BadRequestException, createParamDecorator, ExecutionContext } from '@nestjs/common'
-import { getPrismaWhere } from 'src/prisma/prisma.utils'
+import { getPrismaWhere } from 'src/common/services/prisma/prisma.utils'
 
 export class QueryDto {
   skip: number

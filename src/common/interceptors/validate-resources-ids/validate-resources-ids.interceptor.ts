@@ -7,8 +7,8 @@ import {
 } from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
 import { Observable } from 'rxjs'
+import { PrismaService } from 'src/common/services/prisma/prisma.service'
 import { VALIDATE_RESOURCES_IDS } from 'src/consts'
-import { PrismaService } from 'src/prisma/prisma.service'
 
 @Injectable()
 export class ValidateResourcesIdsInterceptor implements NestInterceptor {
@@ -25,11 +25,7 @@ export class ValidateResourcesIdsInterceptor implements NestInterceptor {
     }
 
     const request = context.switchToHttp().getRequest()
-    const projectId = request.params.projectId
-    const taskId = request.params.taskId
-    const userId = request.params.userId
-    const commentId = request.params.commentId
-    const collaboratorId = request.params.collaboratorId
+    const { projectId, taskId, userId, commentId, collaboratorId } = request.params
 
     if (projectId) {
       const project = await this.prisma.project.findFirst({

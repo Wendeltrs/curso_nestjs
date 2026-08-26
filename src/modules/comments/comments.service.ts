@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
-import { QueryDto } from 'src/common/services/query/query.decorator'
+import { QueryDto } from 'src/common/decorators/query/query.decorator'
+import { PrismaService } from 'src/common/services/prisma/prisma.service'
 import { SessionService } from 'src/common/services/session/session.service'
-import { PrismaService } from 'src/prisma/prisma.service'
 import { CommentCreateDTO, CommentUpdateDTO } from './comments.dto'
 
 @Injectable()
@@ -11,13 +11,13 @@ export class CommentsService {
     private session: SessionService,
   ) {}
 
-  public async getAll(query: QueryDto) {
-    return await this.prisma.comment.findMany({
+  public async getAll(query?: QueryDto) {
+    return await this.prisma.extensions.comment.findManyAndCount({
       skip: query?.skip,
       take: query?.take,
       orderBy: query?.orderBy,
       where: {
-        ...query.where,
+        ...query?.where,
         deletedAt: null,
       },
       include: {
