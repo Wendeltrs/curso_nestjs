@@ -75,18 +75,6 @@ export class CommentsService {
   }
 
   public async update(id: string, data: CommentUpdateDTO) {
-    const existingComment = await this.prisma.comment.findFirst({
-      where: {
-        id,
-        authorId: this.session.getUserId(),
-        deletedAt: null,
-      },
-    })
-
-    if (!existingComment) {
-      throw new NotFoundException('Comment not found')
-    }
-
     return await this.prisma.comment.update({
       where: {
         id,
@@ -98,19 +86,7 @@ export class CommentsService {
   }
 
   public async delete(id: string) {
-    const existingComment = await this.prisma.comment.findFirst({
-      where: {
-        id,
-        authorId: this.session.getUserId(),
-        deletedAt: null,
-      },
-    })
-
-    if (!existingComment) {
-      throw new NotFoundException('Comment not found')
-    }
-
-    return await this.prisma.comment.update({
+    await this.prisma.comment.update({
       where: {
         id,
       },

@@ -120,7 +120,7 @@ export class ProjectCollaboratorsService {
       throw new BadRequestException('Owner cannot be deleted')
     }
 
-    return await this.prisma.projectCollaborator.update({
+    await this.prisma.projectCollaborator.update({
       where: {
         id,
       },

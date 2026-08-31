@@ -10,8 +10,8 @@ export class SerializerInterceptor implements NestInterceptor {
   public intercept(_context: ExecutionContext, next: CallHandler) {
     return next.handle().pipe(
       map((data) => {
-        return instanceToInstance(plainToInstance(this.useClass, data), {
-          excludeExtraneousValues: true,
+        return instanceToInstance(plainToInstance(this.useClass, data), { //plainToInstance: transforma os dados em um objeto do tipo fornecido
+          excludeExtraneousValues: true, //exclui os valores extras
         })
       }),
     )

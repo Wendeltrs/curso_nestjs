@@ -1,6 +1,7 @@
 import { Body, Controller, Get, HttpStatus, Post, UseGuards } from '@nestjs/common'
 import { ApiResponse } from '@nestjs/swagger'
 import { AuthenticatedUser } from 'src/common/decorators/authenticated-user/authenticated-user.decorator'
+import { Serializer } from 'src/common/decorators/serializer/serializer.decorator'
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth/jwt-auth.guard'
 import { User } from 'src/models/user'
 import {
@@ -12,7 +13,6 @@ import {
   SignUpDTO,
 } from './auth.dto'
 import { AuthService } from './auth.service'
-import { Serializer } from 'src/common/decorators/serializer/serializer.decorator'
 
 @Controller({ path: 'auth', version: '1' })
 export class AuthController {

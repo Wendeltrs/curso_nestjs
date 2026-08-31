@@ -38,16 +38,16 @@ export class ProjectsController {
   @ApiPaginatedResponse(ProjectFullDTO)
   @Paginator()
   @Serializer(Project)
-  public getAll(@QueryPaginator() query: QueryDto) {
-    return this.projectsService.getAll(query)
+  public async getAll(@QueryPaginator() query?: QueryDto) {
+    return await this.projectsService.getAll(query)
   }
 
   @Get(':projectId')
   @ApiResponse({ type: ProjectFullDTO, status: HttpStatus.OK })
   @ValidateResourcesIds()
   @Serializer(Project)
-  public get(@Param('projectId', ParseUUIDPipe) id: string) {
-    return this.projectsService.get(id)
+  public async get(@Param('projectId', ParseUUIDPipe) id: string) {
+    return await this.projectsService.get(id)
   }
 
   @Post()
@@ -55,8 +55,8 @@ export class ProjectsController {
     type: ProjectDTO,
     status: HttpStatus.CREATED,
   })
-  public create(@Body() data: ProjectCreateDTO) {
-    return this.projectsService.create(data)
+  public async create(@Body() data: ProjectCreateDTO) {
+    return await this.projectsService.create(data)
   }
 
   @Put(':projectId')
@@ -65,15 +65,15 @@ export class ProjectsController {
     status: HttpStatus.OK,
   })
   @ValidateResourcesIds()
-  public update(@Param('projectId', ParseUUIDPipe) id: string, @Body() data: ProjectUpdateDTO) {
-    return this.projectsService.update(id, data)
+  public async update(@Param('projectId', ParseUUIDPipe) id: string, @Body() data: ProjectUpdateDTO) {
+    return await this.projectsService.update(id, data)
   }
 
   @Delete(':projectId')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ValidateResourcesIds()
   @ApiNoContentResponse({ description: 'Project deleted successfully' })
-  public delete(@Param('projectId', ParseUUIDPipe) id: string) {
-    return this.projectsService.delete(id)
+  public async delete(@Param('projectId', ParseUUIDPipe) id: string) {
+    await this.projectsService.delete(id)
   }
 }

@@ -8,6 +8,7 @@ import {
 import { Reflector } from '@nestjs/core'
 import { Observable } from 'rxjs'
 import { PrismaService } from 'src/common/services/prisma/prisma.service'
+import { SessionService } from 'src/common/services/session/session.service'
 import { VALIDATE_RESOURCES_IDS } from 'src/consts'
 
 @Injectable()
@@ -15,6 +16,7 @@ export class ValidateResourcesIdsInterceptor implements NestInterceptor {
   constructor(
     private reflector: Reflector,
     private prisma: PrismaService,
+    private session: SessionService,
   ) {}
 
   async intercept(context: ExecutionContext, next: CallHandler): Promise<Observable<Request>> {
@@ -70,6 +72,7 @@ export class ValidateResourcesIdsInterceptor implements NestInterceptor {
       const comment = await this.prisma.comment.findFirst({
         where: {
           id: commentId,
+          authorId: this.session.getUserId(),
           deletedAt: null,
         },
       })

@@ -12,13 +12,13 @@ export class ProjectsService {
     private session: SessionService,
   ) {}
 
-  public async getAll(query: QueryDto) {
+  public async getAll(query?: QueryDto) {
     return await this.prisma.extensions.project.findManyAndCount({
       skip: query?.skip,
       take: query?.take,
       orderBy: query?.orderBy,
       where: {
-        ...query.where,
+        ...query?.where,
         creatorId: this.session.getUserId(),
         deletedAt: null,
       },
@@ -86,7 +86,7 @@ export class ProjectsService {
       },
     })
 
-    return await this.prisma.project.update({
+    await this.prisma.project.update({
       where: {
         id,
         creatorId: this.session.getUserId(),

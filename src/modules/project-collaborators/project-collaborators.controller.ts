@@ -77,6 +77,6 @@ export class ProjectCollaboratorsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiNoContentResponse({ description: 'Collaborator deleted successfully' })
   public async delete(@Param('collaboratorId') id: string) {
-    return await this.projectCollaboratorsService.delete(id)
+    await this.projectCollaboratorsService.delete(id)
   }
 }

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, NotFoundException } from '@nestjs/common'
 import { QueryDto } from 'src/common/decorators/query/query.decorator'
 import { CloudinaryService } from 'src/common/services/cloudinary/cloudinary.service'
 import { PrismaService } from 'src/common/services/prisma/prisma.service'
@@ -47,7 +47,7 @@ export class UsersService {
   }
 
   public async getEmail(email: string) {
-    return await this.prisma.user.findFirst({
+    const user = await this.prisma.user.findFirst({
       where: {
         email,
         deletedAt: null,
@@ -59,6 +59,12 @@ export class UsersService {
         tasksAssigned: true,
       },
     })
+
+    if (!user) {
+      throw new NotFoundException('User not found')
+    }
+
+    return user
   }
 
   public async create(data: UserCreateDTO) {
@@ -99,7 +105,7 @@ export class UsersService {
   }
 
   public async delete(id: string) {
-    return await this.prisma.user.update({
+    await this.prisma.user.update({
       where: {
         id,
       },

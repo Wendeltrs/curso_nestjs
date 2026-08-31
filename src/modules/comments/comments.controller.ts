@@ -36,20 +36,20 @@ export class CommentsController {
   @ApiPaginatedResponse(CommentFullDTO)
   @Paginator()
   @Serializer(Comment)
-  public getAll(@QueryPaginator() query: QueryDto, @Query('taskId') taskId: string) {
-    return this.commentsService.getAll({ ...query, taskId })
+  public async getAll(@QueryPaginator() query: QueryDto, @Query('taskId') taskId: string) {
+    return await this.commentsService.getAll({ ...query, taskId })
   }
 
   @Get(':commentId')
   @ApiResponse({ type: CommentFullDTO, status: HttpStatus.OK })
   @ValidateResourcesIds()
   @Serializer(Comment)
-  public get(
+  public async get(
     @Param('commentId', ParseUUIDPipe) id: string,
     @QueryPaginator() query: QueryDto,
     @Query('taskId') taskId: string,
   ) {
-    return this.commentsService.get(id, { ...query, taskId })
+    return await this.commentsService.get(id, { ...query, taskId })
   }
 
   @Post()
@@ -57,8 +57,8 @@ export class CommentsController {
     type: CommentDTO,
     status: HttpStatus.CREATED,
   })
-  public create(@Body() data: CommentCreateDTO) {
-    return this.commentsService.create(data)
+  public async create(@Body() data: CommentCreateDTO) {
+    return await this.commentsService.create(data)
   }
 
   @Put(':commentId')
@@ -67,15 +67,18 @@ export class CommentsController {
     status: HttpStatus.OK,
   })
   @ValidateResourcesIds()
-  public update(@Param('commentId', ParseUUIDPipe) id: string, @Body() data: CommentUpdateDTO) {
-    return this.commentsService.update(id, data)
+  public async update(
+    @Param('commentId', ParseUUIDPipe) id: string,
+    @Body() data: CommentUpdateDTO,
+  ) {
+    return await this.commentsService.update(id, data)
   }
 
   @Delete(':commentId')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ValidateResourcesIds()
   @ApiNoContentResponse({ description: 'Comment deleted successfully' })
-  public delete(@Param('commentId', ParseUUIDPipe) id: string) {
-    return this.commentsService.delete(id)
+  public async delete(@Param('commentId', ParseUUIDPipe) id: string) {
+    await this.commentsService.delete(id)
   }
 }

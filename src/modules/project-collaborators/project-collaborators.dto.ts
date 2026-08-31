@@ -50,14 +50,4 @@ export class ProjectCollaboratorUpdateDTO {
   @IsEnum(CollaboratorRole)
   @IsOptional()
   role: CollaboratorRole
-
-  @ApiProperty({ description: 'User id', required: false })
-  @IsString()
-  @IsOptional()
-  userId: string
-
-  @ApiProperty({ description: 'Project id', required: false })
-  @IsString()
-  @IsOptional()
-  projectId: string
 }

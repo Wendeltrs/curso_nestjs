@@ -71,7 +71,7 @@ export class UsersController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiNoContentResponse({ description: 'User deleted successfully' })
   public async delete(@Param('userId') id: string) {
-    return await this.usersService.delete(id)
+    await this.usersService.delete(id)
   }
 
   @Post('/avatar')
