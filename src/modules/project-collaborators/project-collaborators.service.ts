@@ -12,7 +12,6 @@ export class ProjectCollaboratorsService {
   constructor(private prisma: PrismaService) {}
 
   public async getAll(query?: QueryDto & { projectId: string }) {
-    console.log(query)
     const project = await this.prisma.project.findFirst({
       where: {
         id: query?.projectId,
