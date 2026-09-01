@@ -55,6 +55,7 @@ export class TasksController {
   @Post()
   @ApiResponse({ type: TasksDTO, status: HttpStatus.CREATED })
   public create(@Body() data: TaskCreateDTO) {
+    console.log(data)
     return this.tasksService.create(data)
   }
 

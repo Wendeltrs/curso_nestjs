@@ -4,6 +4,7 @@ import { Test, TestingModule } from '@nestjs/testing'
 import * as bcrypt from 'bcrypt'
 import { validationError } from 'src/common/mocks/tests.mocks'
 import { PrismaService } from 'src/common/services/prisma/prisma.service'
+import { SessionService } from 'src/common/services/session/session.service'
 import { MailService } from '../mail/mail.service'
 import { mockedUsers } from '../users/users.mocks'
 import { UsersService } from '../users/users.service'
@@ -46,6 +47,7 @@ describe('AuthService', () => {
           useValue: {
             user: {
               update: jest.fn(),
+              findFirst: jest.fn(),
             },
           },
         },
@@ -53,6 +55,12 @@ describe('AuthService', () => {
           provide: MailService,
           useValue: {
             forgotPassword: jest.fn(),
+          },
+        },
+        {
+          provide: SessionService,
+          useValue: {
+            getUserId: jest.fn().mockReturnValue('user-1'),
           },
         },
       ],
@@ -161,6 +169,58 @@ describe('AuthService', () => {
       jest.spyOn(usersService, 'get').mockRejectedValue(error)
 
       await expect(service.resetPassword('', '')).rejects.toThrow(error)
+    })
+  })
+
+  describe('Change Password', () => {
+    it('should be able to change password', async () => {
+      jest.spyOn(usersService, 'get').mockResolvedValue(mockedUsers[0])
+      jest.spyOn(bcrypt, 'compare').mockResolvedValue(true as never)
+      jest.spyOn(prisma.user, 'update').mockResolvedValue(mockedUsers[0])
+
+      const result = await service.changePassword({
+        password: mockedUsers[0].password,
+        newPassword: mockedUsers[0].password,
+      })
+
+      expect(result).toEqual({ message: 'Password updated' })
+      expect(usersService.get).toHaveBeenCalledTimes(1)
+      expect(prisma.user.update).toHaveBeenCalledTimes(1)
+      expect(bcrypt.hash).toHaveBeenCalledWith(mockedUsers[0].password, 12)
+    })
+
+    it('should be able to throw an error if user is not authorized', async () => {
+      const error = new UnauthorizedException()
+
+      jest.spyOn(usersService, 'get').mockRejectedValue(error)
+
+      await expect(
+        service.changePassword({
+          password: '',
+          newPassword: '',
+        }),
+      ).rejects.toThrow(error)
+      expect(usersService.get).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  describe('Get Me', () => {
+    it('should be able to return user if authorized', async () => {
+      jest.spyOn(prisma.user, 'findFirst').mockResolvedValue(mockedUsers[0])
+
+      const result = await service.getMe(mockedUsers[0].id)
+
+      expect(result).toEqual(mockedUsers[0])
+      expect(prisma.user.findFirst).toHaveBeenCalledTimes(1)
+    })
+
+    it('should be able to throw an error if user is not authorized', async () => {
+      const error = new UnauthorizedException()
+
+      jest.spyOn(prisma.user, 'findFirst').mockRejectedValue(error)
+
+      await expect(service.getMe(mockedUsers[0].id)).rejects.toThrow(error)
+      expect(prisma.user.findFirst).toHaveBeenCalledTimes(1)
     })
   })
 })

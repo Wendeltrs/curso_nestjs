@@ -18,8 +18,10 @@ describe('AuthController', () => {
     })
       .overrideProvider(AuthService)
       .useValue({
+        getMe: jest.fn(),
         signUp: jest.fn(),
         signIn: jest.fn(),
+        changePassword: jest.fn(),
         forgotPassword: jest.fn(),
         resetPassword: jest.fn(),
       })
@@ -109,11 +111,33 @@ describe('AuthController', () => {
     })
   })
 
+  describe('Change Password', () => {
+    it('should be able to change password', async () => {
+      jest.spyOn(service, 'changePassword').mockResolvedValue({ message: 'Password updated' })
+
+      const result = await controller.changePassword({
+        password: user.password,
+        newPassword: user.password,
+      })
+
+      expect(result).toEqual({ message: 'Password updated' })
+      expect(service.changePassword).toHaveBeenCalledTimes(1)
+      expect(service.changePassword).toHaveBeenCalledWith({
+        password: user.password,
+        newPassword: user.password,
+      })
+    })
+  })
+
   describe('Get Me', () => {
     it('should be able to receive the user by decorator', async () => {
+      jest.spyOn(service, 'getMe').mockResolvedValue(user)
+
       const result = await controller.getMe(user as never)
 
       expect(result).toEqual(user)
+      expect(service.getMe).toHaveBeenCalledTimes(1)
+      expect(service.getMe).toHaveBeenCalledWith(user.id)
     })
   })
 })

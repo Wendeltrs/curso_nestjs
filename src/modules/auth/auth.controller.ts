@@ -6,6 +6,7 @@ import { JwtAuthGuard } from 'src/common/guards/jwt-auth/jwt-auth.guard'
 import { User } from 'src/models/user'
 import {
   AuthenticatedDTO,
+  ChangePasswordDTO,
   ForgotPasswordDTO,
   MessageDTO,
   ResetPasswordDTO,
@@ -41,12 +42,19 @@ export class AuthController {
   public async resetPassword(@Body() data: ResetPasswordDTO) {
     return await this.authService.resetPassword(data.token, data.newPassword)
   }
+  
+  @Post('change-password')
+  @ApiResponse({ status: HttpStatus.OK, type: MessageDTO })
+  @UseGuards(JwtAuthGuard)
+  public async changePassword(@Body() data: ChangePasswordDTO) {
+    return await this.authService.changePassword(data)
+  }
 
   @Get('/me')
   @ApiResponse({ status: HttpStatus.OK, type: User })
   @UseGuards(JwtAuthGuard)
   @Serializer(User)
-  public async getMe(@AuthenticatedUser() user: User) {
-    return user
+  public async getMe(@AuthenticatedUser() getUser: User) {
+    return this.authService.getMe(getUser.id)
   }
 }

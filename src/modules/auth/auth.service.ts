@@ -2,9 +2,10 @@ import { Injectable, UnauthorizedException } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import * as bcrypt from 'bcrypt'
 import { PrismaService } from 'src/common/services/prisma/prisma.service'
+import { SessionService } from 'src/common/services/session/session.service'
 import { MailService } from '../mail/mail.service'
 import { UsersService } from '../users/users.service'
-import { SignInDTO, SignUpDTO } from './auth.dto'
+import { ChangePasswordDTO, SignInDTO, SignUpDTO } from './auth.dto'
 
 @Injectable()
 export class AuthService {
@@ -13,6 +14,7 @@ export class AuthService {
     private jwtService: JwtService,
     private prisma: PrismaService,
     private mail: MailService,
+    private session: SessionService,
   ) {}
 
   public async signUp(data: SignUpDTO) {
@@ -106,5 +108,40 @@ export class AuthService {
     return {
       message: 'Password updated',
     }
+  }
+
+  public async changePassword(data: ChangePasswordDTO) {
+    const user = await this.usersService.get(this.session.getUserId())
+
+    if (user && (await bcrypt.compare(data.currentPassword, user.password))) {
+      const hashedPassword = await bcrypt.hash(data.newPassword, 12)
+
+      await this.prisma.user.update({
+        where: {
+          id: user.id,
+        },
+        data: {
+          password: hashedPassword,
+        },
+      })
+
+      return {
+        message: 'Password updated',
+      }
+    }
+
+    throw new UnauthorizedException()
+  }
+
+  public async getMe(id: string) {
+    const user = await this.prisma.user.findFirst({
+      where: { id },
+    })
+
+    if (!user) {
+      throw new UnauthorizedException()
+    }
+
+    return user
   }
 }

@@ -44,6 +44,7 @@ export class ProjectsService {
   }
 
   public async create(data: ProjectCreateDTO) {
+    console.log(data)
     const project = await this.prisma.project.create({
       data: {
         name: data.name,
