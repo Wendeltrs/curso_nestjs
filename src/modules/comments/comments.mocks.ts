@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker'
-import { Comment, Task, User } from '@prisma/client'
+import { Comment, Task, User } from '@prisma-generated/client'
 import { mockPaginationQuery } from 'src/common/mocks/tests.mocks'
 
 type CommentsWithRelations = Comment & {

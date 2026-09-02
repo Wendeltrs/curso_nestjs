@@ -1,4 +1,4 @@
-import { Prisma } from '@prisma/client'
+import { Prisma } from '@prisma-generated/client'
 
 type DeleteManyArgs<T, A> = Prisma.Exact<A, Prisma.Args<T, 'deleteMany'>>
 type FindManyArgs<T, A> = Prisma.Exact<A, Prisma.Args<T, 'findMany'>>

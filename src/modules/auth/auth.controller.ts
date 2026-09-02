@@ -42,7 +42,7 @@ export class AuthController {
   public async resetPassword(@Body() data: ResetPasswordDTO) {
     return await this.authService.resetPassword(data.token, data.newPassword)
   }
-  
+
   @Post('change-password')
   @ApiResponse({ status: HttpStatus.OK, type: MessageDTO })
   @UseGuards(JwtAuthGuard)

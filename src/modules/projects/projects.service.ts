@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common'
-import { CollaboratorRole } from '@prisma/client'
+import { CollaboratorRole } from '@prisma-generated/client'
 import { QueryDto } from 'src/common/decorators/query/query.decorator'
 import { PrismaService } from 'src/common/services/prisma/prisma.service'
 import { SessionService } from 'src/common/services/session/session.service'

@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker'
-import { Project, ProjectCollaborator, User } from '@prisma/client'
+import { Project, ProjectCollaborator, User } from '@prisma-generated/client'
 
 type CollaboratosWithRelations = ProjectCollaborator & {
   user: User

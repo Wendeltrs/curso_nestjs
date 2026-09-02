@@ -1,6 +1,6 @@
 import { Readable } from 'node:stream'
 import { faker } from '@faker-js/faker'
-import { Comment, Project, ProjectCollaborator, Task, User } from '@prisma/client'
+import { Comment, Project, ProjectCollaborator, Task, User } from '@prisma-generated/client'
 
 type UserRelations = User & {
   projects: Project[]

@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker'
-import { Project, Task, User } from '@prisma/client'
+import { Project, Task, User } from '@prisma-generated/client'
 
 export type ProjectWithRelations = Project & {
   tasks: Task[]

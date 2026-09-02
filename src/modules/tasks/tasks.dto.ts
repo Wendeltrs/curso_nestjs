@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { TaskPriority, TaskStatus } from '@prisma/client'
+import { TaskPriority, TaskStatus } from '@prisma-generated/client'
 import { IsDateString, IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator'
 import { CommentDTO } from '../comments/comments.dto'
 import { ProjectDTO } from '../projects/projects.dto'
