@@ -8,7 +8,7 @@ import { SessionService } from 'src/common/services/session/session.service'
 import { MailService } from '../mail/mail.service'
 import { mockedUsers } from '../users/users.mocks'
 import { UsersService } from '../users/users.service'
-import { mockedReturnAuth, mockedSignIn, mockedSignUp } from './auth.mocks'
+import { mockedSignIn, mockedSignUp } from './auth.mocks'
 import { AuthService } from './auth.service'
 
 jest.mock('bcrypt', () => ({
@@ -80,9 +80,8 @@ describe('AuthService', () => {
 
       const result = await service.signUp(mockedSignUp)
 
-      expect(result).toEqual(mockedReturnAuth)
+      expect(result).toEqual({ message: 'Signed up successfully' })
       expect(usersService.create).toHaveBeenCalledTimes(1)
-      expect(jwtService.sign).toHaveBeenCalledTimes(1)
       expect(bcrypt.hash).toHaveBeenCalledWith(mockedUsers[0].password, 12)
     })
 
@@ -102,7 +101,7 @@ describe('AuthService', () => {
 
       const result = await service.signIn(mockedSignIn)
 
-      expect(result).toEqual(mockedReturnAuth)
+      expect(result).toEqual('token')
       expect(usersService.getEmail).toHaveBeenCalledTimes(1)
       expect(jwtService.sign).toHaveBeenCalledTimes(1)
       expect(bcrypt.compare).toHaveBeenCalledWith(mockedUsers[0].password, mockedUsers[0].password)
@@ -179,7 +178,7 @@ describe('AuthService', () => {
       jest.spyOn(prisma.user, 'update').mockResolvedValue(mockedUsers[0])
 
       const result = await service.changePassword({
-        password: mockedUsers[0].password,
+        currentPassword: mockedUsers[0].password,
         newPassword: mockedUsers[0].password,
       })
 
@@ -196,7 +195,7 @@ describe('AuthService', () => {
 
       await expect(
         service.changePassword({
-          password: '',
+          currentPassword: '',
           newPassword: '',
         }),
       ).rejects.toThrow(error)

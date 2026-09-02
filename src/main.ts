@@ -3,6 +3,7 @@ import { ValidationPipe, VersioningType } from '@nestjs/common'
 import { NestFactory } from '@nestjs/core'
 import { MicroserviceOptions, Transport } from '@nestjs/microservices'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
+import cookieParse from 'cookie-parser'
 import { AppModule } from './app.module'
 import { EMAIL_QUEUE } from './consts'
 
@@ -45,6 +46,9 @@ async function bootstrap() {
   })
 
   await app.startAllMicroservices()
+
+  //Cookies
+  app.use(cookieParse())
 
   //CORS
   app.enableCors({

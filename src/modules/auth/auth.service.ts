@@ -20,26 +20,12 @@ export class AuthService {
   public async signUp(data: SignUpDTO) {
     const hashedPassword = await bcrypt.hash(data.password, 12)
 
-    const newUser = await this.usersService.create({
+    await this.usersService.create({
       ...data,
       password: hashedPassword,
     })
 
-    const token = this.jwtService.sign({
-      sub: newUser.id,
-      email: newUser.email,
-      role: newUser.role,
-    })
-
-    return {
-      token: token,
-      user: {
-        id: newUser.id,
-        name: newUser.name,
-        email: newUser.email,
-        role: newUser.role,
-      },
-    }
+    return { message: 'Signed up successfully' }
   }
 
   public async signIn(data: SignInDTO) {
@@ -52,15 +38,7 @@ export class AuthService {
         role: user.role,
       })
 
-      return {
-        token: token,
-        user: {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
-        },
-      }
+      return token
     }
 
     throw new UnauthorizedException()
